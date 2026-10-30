@@ -398,6 +398,11 @@ namespace djv
             //! grew -- frames added after the ones it had, as a render writes
             //! them -- keeps the frames decoded and the thumbnails made.
             void _reload(bool restructured, bool keepCache = false);
+            //! Read again the frames of the sequence shown that were written
+            //! over since they were read.
+            void _frameTimesCheck(
+                const std::shared_ptr<tl::Player>&,
+                const ftk::Path&);
             void _autoReload();
             void _reloadUpdate(const std::shared_ptr<models::FilesModelItem>&);
             //! Thumbnails color managed as the viewport shows the picture.

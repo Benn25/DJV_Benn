@@ -36,6 +36,8 @@
 
 #include <chrono>
 #include <filesystem>
+#include <future>
+#include <map>
 #include <optional>
 
 namespace djv
@@ -135,6 +137,12 @@ namespace djv
             std::shared_ptr<ftk::Timer> autosaveTimer;
             //! Watches the sequence being shown for frames added on disk.
             std::shared_ptr<ftk::Timer> autoReloadTimer;
+            //! When each frame of the sequence shown was last written, by
+            //! frame, read from its directory off the main thread: a frame
+            //! written over -- part of a render done again -- is read again.
+            std::string frameTimesPath;
+            std::map<int64_t, int64_t> frameTimes;
+            std::future<std::map<int64_t, int64_t> > frameTimesFuture;
             //! With DJV_CACHE_BENCH set, logs how fast the video cache fills.
             std::shared_ptr<ftk::Timer> cacheBenchTimer;
             std::chrono::steady_clock::time_point cacheBenchStart;

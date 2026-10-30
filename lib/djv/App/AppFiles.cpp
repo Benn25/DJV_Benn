@@ -17,6 +17,7 @@
 #include <djv/Models/RecentFilesModel.h>
 
 #include <tlRender/UI/ThumbnailSystem.h>
+#include <tlRender/UI/TimelineWidget.h>
 #include <tlRender/Timeline/CompareOptions.h>
 #include <tlRender/Timeline/Util.h>
 #include <tlRender/IO/Plugin.h>
@@ -463,6 +464,7 @@ namespace djv
             {
                 return;
             }
+            _frameTimesCheck(player, path);
             ftk::PathOptions pathOptions;
             pathOptions.seqMaxDigits = imageSeq.maxDigits;
             const auto seq = ftk::findSeq(path, pathOptions);
@@ -502,6 +504,103 @@ namespace djv
                     }
                 }
                 _reload(false, grown);
+            }
+        }
+
+        namespace
+        {
+            //! When each frame of a sequence was last written, from one
+            //! listing of its directory: on Windows the listing carries the
+            //! times, so there is no call per file, which over a network
+            //! share would be one round trip each.
+            std::map<int64_t, int64_t> readFrameTimes(const ftk::Path& path)
+            {
+                std::map<int64_t, int64_t> out;
+                const std::string base = path.getBase();
+                const std::string ext = ftk::toLower(path.getExt());
+                std::error_code ec;
+                std::filesystem::directory_iterator i(
+                    ftk::toFileSystem(path.getDir().empty() ? std::string(".") : path.getDir()), ec);
+                for (; !ec && i != std::filesystem::directory_iterator(); i.increment(ec))
+                {
+                    const std::string name = ftk::fromFileSystem(i->path().filename());
+                    if (name.size() <= base.size() + ext.size() ||
+                        name.compare(0, base.size(), base) != 0 ||
+                        ftk::toLower(name.substr(name.size() - ext.size())) != ext)
+                    {
+                        continue;
+                    }
+                    const std::string num = name.substr(base.size(), name.size() - base.size() - ext.size());
+                    if (num.empty() || num.find_first_not_of("0123456789") != std::string::npos)
+                    {
+                        continue;
+                    }
+                    std::error_code ec2;
+                    const auto time = i->last_write_time(ec2);
+                    if (!ec2)
+                    {
+                        out[std::stoll(num)] = static_cast<int64_t>(time.time_since_epoch().count());
+                    }
+                }
+                return out;
+            }
+        }
+
+        void App::_frameTimesCheck(
+            const std::shared_ptr<tl::Player>& player,
+            const ftk::Path& path)
+        {
+            FTK_P();
+            const std::string key = path.getDir() + path.getBase() + path.getExt();
+
+            // The last listing, against the one before it.
+            if (p.frameTimesFuture.valid() &&
+                std::future_status::ready == p.frameTimesFuture.wait_for(std::chrono::seconds(0)))
+            {
+                const auto times = p.frameTimesFuture.get();
+                if (key == p.frameTimesPath && !p.frameTimes.empty())
+                {
+                    const OTIO_NS::TimeRange& timeRange = player->getTimeRange();
+                    const double rate = timeRange.duration().rate();
+                    std::vector<OTIO_NS::RationalTime> changed;
+                    for (const auto& i : times)
+                    {
+                        const auto j = p.frameTimes.find(i.first);
+                        if (j != p.frameTimes.end() && j->second != i.second)
+                        {
+                            if (const auto t = player->getTimeline()->getTimelineTime(
+                                timeRange.start_time(),
+                                OTIO_NS::RationalTime(static_cast<double>(i.first), rate)))
+                            {
+                                changed.push_back(t.value());
+                            }
+                        }
+                    }
+                    if (!changed.empty())
+                    {
+                        player->removeVideoCache(changed);
+                        if (auto mainWindow = p.mainWindow)
+                        {
+                            mainWindow->getTimelineWidget()->refreshMedia();
+                        }
+                        _context->log(
+                            "djv::app::App",
+                            ftk::Format("{0} frame(s) written over, read again").arg(changed.size()));
+                    }
+                }
+                p.frameTimes = times;
+                p.frameTimesPath = key;
+            }
+
+            // The next listing, off the main thread.
+            if (!p.frameTimesFuture.valid())
+            {
+                p.frameTimesFuture = std::async(
+                    std::launch::async,
+                    [path]
+                    {
+                        return readFrameTimes(path);
+                    });
             }
         }
 

@@ -281,22 +281,31 @@ namespace djv
             fileBrowserSystem->getModel()->setOptions(fileBrowser.options);
             fileBrowserSystem->getModel()->setExt(fileBrowser.ext);
 
+            // The settings save every value, the defaults too, so a default
+            // that changed never reaches anyone who had saved before. Those
+            // saved as the defaults they were are brought up to the
+            // defaults of now, once, with the rest kept: version 1 had
+            // sequences at 24 frames a second decoded on eight threads,
+            // and versions 1 and 2 a missing frame an error.
             ImageSeqSettings imageSeq;
-            if (!settings->getT(keys["ImageSeq"], imageSeq) &&
-                settings->getT(settingsKeys::imageSeqPrevious, imageSeq))
+            if (!settings->getT(keys["ImageSeq"], imageSeq))
             {
-                // The settings save every value, the defaults too, so a
-                // default that changed never reached anyone who had saved
-                // before: sequences went on opening at 24 frames a second,
-                // decoded on eight threads. Those two are brought up to the
-                // defaults of now, once, with the rest kept.
-                if (24.0 == imageSeq.io.defaultSpeed)
+                bool previous = settings->getT(settingsKeys::imageSeqPrevious, imageSeq);
+                if (!previous && settings->getT(settingsKeys::imageSeqPrevious1, imageSeq))
                 {
-                    imageSeq.io.defaultSpeed = tl::SeqOptions().defaultSpeed;
+                    previous = true;
+                    if (24.0 == imageSeq.io.defaultSpeed)
+                    {
+                        imageSeq.io.defaultSpeed = tl::SeqOptions().defaultSpeed;
+                    }
+                    if (8 == imageSeq.readThreadCount)
+                    {
+                        imageSeq.readThreadCount = tl::getDefaultReadThreadCount();
+                    }
                 }
-                if (8 == imageSeq.readThreadCount)
+                if (previous && tl::MissingFrames::Error == imageSeq.io.missingFrames)
                 {
-                    imageSeq.readThreadCount = tl::getDefaultReadThreadCount();
+                    imageSeq.io.missingFrames = tl::SeqOptions().missingFrames;
                 }
             }
             p.imageSeq = ftk::Observable<ImageSeqSettings>::create(imageSeq);

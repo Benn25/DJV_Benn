@@ -1,4 +1,4 @@
 [submodule "deps/tlRender"]
 	path = deps/tlRender
-	url = https://github.com/bennXeffect/tlRender.git
+	url = https://github.com/Benn25/tlRender.git
 	branch = benn/dev

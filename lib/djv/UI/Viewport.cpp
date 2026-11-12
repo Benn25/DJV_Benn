@@ -58,6 +58,10 @@ namespace djv
 
             const std::chrono::seconds toastTimeout(5);
             const std::chrono::seconds hintTimeout(3);
+
+            //! A report is shown this long, then fades out over the second.
+            const std::chrono::seconds reportTimeout(5);
+            const std::chrono::seconds reportFade(1);
         }
 
         namespace
@@ -199,6 +203,7 @@ namespace djv
 
             std::string reportText;
             ftk::Color4F reportColor;
+            std::chrono::steady_clock::time_point reportTime;
             std::shared_ptr<ftk::Timer> reportTimer;
             std::shared_ptr<ftk::VerticalLayout> hudLayout;
             std::map<models::HUDPos, std::shared_ptr<ftk::VerticalLayout> > hudLayouts;
@@ -498,6 +503,7 @@ namespace djv
 
             p.toastTimer = ftk::Timer::create(context);
             p.reportTimer = ftk::Timer::create(context);
+            p.reportTimer->setRepeating(true);
 
             p.fpsObserver = ftk::Observer<double>::create(
                 observeFPS(),
@@ -942,13 +948,25 @@ namespace djv
             FTK_P();
             p.reportText = value;
             p.reportColor = color;
+            p.reportTime = std::chrono::steady_clock::now();
             setDrawUpdate();
+            // Drawn again through its fade only; the timer stops with it.
             p.reportTimer->start(
-                toastTimeout,
+                std::chrono::milliseconds(30),
                 [this]
                 {
-                    _p->reportText = std::string();
-                    setDrawUpdate();
+                    FTK_P();
+                    const auto elapsed = std::chrono::steady_clock::now() - p.reportTime;
+                    if (elapsed >= reportTimeout + reportFade)
+                    {
+                        p.reportText = std::string();
+                        p.reportTimer->stop();
+                        setDrawUpdate();
+                    }
+                    else if (elapsed >= reportTimeout)
+                    {
+                        setDrawUpdate();
+                    }
                 });
         }
 
@@ -1885,9 +1903,15 @@ namespace djv
         {
             tl::ui::Viewport::drawOverlayEvent(drawRect, event);
             FTK_P();
-            // The report, top middle, dark text on its color.
+            // The report, top middle, dark text on its color, fading out.
             if (!p.reportText.empty())
             {
+                const std::chrono::duration<float> fade =
+                    std::chrono::steady_clock::now() - p.reportTime - reportTimeout;
+                const float opacity = std::clamp(
+                    1.F - fade.count() / std::chrono::duration<float>(reportFade).count(),
+                    0.F,
+                    1.F);
                 const float s = event.displayScale;
                 const ftk::FontInfo fontInfo = event.style->getFont(ftk::FontType::Regular, s);
                 const ftk::FontMetrics fontMetrics = event.fontSystem->getMetrics(fontInfo);
@@ -1900,12 +1924,14 @@ namespace djv
                     g.min.y + marginY,
                     textSize.w + marginX * 2,
                     fontMetrics.lineHeight + marginY * 2);
-                event.render->drawRect(box, p.reportColor);
+                ftk::Color4F color = p.reportColor;
+                color.a *= opacity;
+                event.render->drawRect(box, color);
                 event.render->drawText(
                     event.fontSystem->getGlyphs(p.reportText, fontInfo),
                     fontMetrics,
                     ftk::V2I(box.min.x + marginX, box.min.y + marginY),
-                    ftk::Color4F(.08F, .08F, .08F));
+                    ftk::Color4F(.08F, .08F, .08F, opacity));
             }
 #if defined(FTK_SDL3)
             // The shuttle's pointer, in place of the system's: a double

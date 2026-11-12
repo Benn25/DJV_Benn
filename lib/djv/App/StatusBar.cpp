@@ -141,8 +141,10 @@ namespace djv
                         return;
                     p.message = value;
                     _messagesUpdate();
+                    // Long, unlike a message: it is where a render has got
+                    // to, and stays until something else is said.
                     p.messagesTimer->start(
-                        std::chrono::seconds(5),
+                        std::chrono::minutes(2),
                         [this]
                         {
                             _p->message = std::string();

@@ -89,6 +89,11 @@ namespace djv
             //! it is what to do next, e.g., how to leave presentation mode.
             DJV_UI_API void showHint(const std::string&);
 
+            //! Show a report at the top middle for a few seconds, on a block
+            //! of its color: e.g. the frames a render just wrote. Shown with
+            //! the HUD off too.
+            DJV_UI_API void showReport(const std::string&, const ftk::Color4F&);
+
             //! Set the present view, for presentation mode, as Blender's
             //! maximized editor shows a render: the picture fitted to the
             //! screen and centered, held there; zoomed in, it moves freely,

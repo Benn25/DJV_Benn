@@ -196,6 +196,10 @@ namespace djv
             std::weak_ptr<models::ColorModel> colorModel;
             std::shared_ptr<ViewportBinding> binding;
             std::shared_ptr<ftk::Timer> toastTimer;
+
+            std::string reportText;
+            ftk::Color4F reportColor;
+            std::shared_ptr<ftk::Timer> reportTimer;
             std::shared_ptr<ftk::VerticalLayout> hudLayout;
             std::map<models::HUDPos, std::shared_ptr<ftk::VerticalLayout> > hudLayouts;
 
@@ -493,6 +497,7 @@ namespace djv
             p.hudLayouts[models::HUDPos::BottomRight]->setParent(bottomRowLayout);
 
             p.toastTimer = ftk::Timer::create(context);
+            p.reportTimer = ftk::Timer::create(context);
 
             p.fpsObserver = ftk::Observer<double>::create(
                 observeFPS(),
@@ -929,6 +934,21 @@ namespace djv
                     _p->toastHint = false;
                     _p->toastLabel->setText(std::string());
                     _toastUpdate();
+                });
+        }
+
+        void Viewport::showReport(const std::string& value, const ftk::Color4F& color)
+        {
+            FTK_P();
+            p.reportText = value;
+            p.reportColor = color;
+            setDrawUpdate();
+            p.reportTimer->start(
+                toastTimeout,
+                [this]
+                {
+                    _p->reportText = std::string();
+                    setDrawUpdate();
                 });
         }
 
@@ -1865,6 +1885,28 @@ namespace djv
         {
             tl::ui::Viewport::drawOverlayEvent(drawRect, event);
             FTK_P();
+            // The report, top middle, dark text on its color.
+            if (!p.reportText.empty())
+            {
+                const float s = event.displayScale;
+                const ftk::FontInfo fontInfo = event.style->getFont(ftk::FontType::Regular, s);
+                const ftk::FontMetrics fontMetrics = event.fontSystem->getMetrics(fontInfo);
+                const ftk::Size2I textSize = event.fontSystem->getSize(p.reportText, fontInfo);
+                const int marginX = event.style->getSizeRole(ftk::SizeRole::Margin, s);
+                const int marginY = event.style->getSizeRole(ftk::SizeRole::MarginSmall, s);
+                const ftk::Box2I& g = getGeometry();
+                const ftk::Box2I box(
+                    g.min.x + g.w() / 2 - textSize.w / 2 - marginX,
+                    g.min.y + marginY,
+                    textSize.w + marginX * 2,
+                    fontMetrics.lineHeight + marginY * 2);
+                event.render->drawRect(box, p.reportColor);
+                event.render->drawText(
+                    event.fontSystem->getGlyphs(p.reportText, fontInfo),
+                    fontMetrics,
+                    ftk::V2I(box.min.x + marginX, box.min.y + marginY),
+                    ftk::Color4F(.08F, .08F, .08F));
+            }
 #if defined(FTK_SDL3)
             // The shuttle's pointer, in place of the system's: a double
             // arrow, as Blender's while it scrubs, white edged with black.

@@ -3,6 +3,7 @@
 
 #include <djv/App/AppPrivate.h>
 #include <djv/App/MainWindow.h>
+#include <djv/UI/Viewport.h>
 #include <djv/Models/AudioModel.h>
 #include <djv/Models/FilesModel.h>
 #include <opentimelineio/externalReference.h>
@@ -444,6 +445,11 @@ namespace djv
 
         namespace
         {
+            //! The colors of the reports in the viewport: green for a frame a
+            //! render added, yellow-green for one it wrote again.
+            const ftk::Color4F newFramesColor(.30F, .76F, .36F);
+            const ftk::Color4F refreshedFramesColor(.68F, .84F, .22F);
+
             //! "New frame 0412", "Refreshed frames 0100-0105 (6)".
             std::string framesReport(const std::string& what, std::vector<int64_t> frames, int pad)
             {
@@ -548,7 +554,12 @@ namespace djv
                     }
                     if (!added.empty())
                     {
-                        report(framesReport("New", added, path.getPad()));
+                        const std::string text = framesReport("New", added, path.getPad());
+                        report(text);
+                        if (auto mainWindow = p.mainWindow)
+                        {
+                            mainWindow->getViewport()->showReport(text, newFramesColor);
+                        }
                     }
                 }
                 _reload(false, grown);
@@ -642,7 +653,12 @@ namespace djv
                     }
                     if (!refreshed.empty())
                     {
-                        report(framesReport("Refreshed", refreshed, path.getPad()));
+                        const std::string text = framesReport("Refreshed", refreshed, path.getPad());
+                        report(text);
+                        if (auto mainWindow = p.mainWindow)
+                        {
+                            mainWindow->getViewport()->showReport(text, refreshedFramesColor);
+                        }
                     }
                 }
                 std::set<int64_t> arrived;

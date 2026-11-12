@@ -442,6 +442,26 @@ namespace djv
             _reload(false);
         }
 
+        namespace
+        {
+            //! "New frame 0412", "Refreshed frames 0100-0105 (6)".
+            std::string framesReport(const std::string& what, std::vector<int64_t> frames, int pad)
+            {
+                std::sort(frames.begin(), frames.end());
+                if (1 == frames.size())
+                {
+                    return ftk::Format("{0} frame {1}").
+                        arg(what).
+                        arg(ftk::toString(frames.front(), pad));
+                }
+                return ftk::Format("{0} frames {1}-{2} ({3})").
+                    arg(what).
+                    arg(ftk::toString(frames.front(), pad)).
+                    arg(ftk::toString(frames.back(), pad)).
+                    arg(frames.size());
+            }
+        }
+
         void App::_autoReload()
         {
             FTK_P();
@@ -504,6 +524,33 @@ namespace djv
                         grown = in;
                     }
                 }
+                if (grown)
+                {
+                    std::vector<int64_t> added;
+                    for (const auto& j : framesAfter)
+                    {
+                        for (int64_t frame = j.range.min(); frame <= j.range.max(); frame += std::max(1, j.inc))
+                        {
+                            bool before = false;
+                            for (const auto& k : framesBefore)
+                            {
+                                if (frame >= k.range.min() && frame <= k.range.max())
+                                {
+                                    before = true;
+                                    break;
+                                }
+                            }
+                            if (!before)
+                            {
+                                added.push_back(frame);
+                            }
+                        }
+                    }
+                    if (!added.empty())
+                    {
+                        report(framesReport("New", added, path.getPad()));
+                    }
+                }
                 _reload(false, grown);
             }
         }
@@ -564,11 +611,16 @@ namespace djv
                     const OTIO_NS::TimeRange& timeRange = player->getTimeRange();
                     const double rate = timeRange.duration().rate();
                     std::vector<OTIO_NS::RationalTime> changed;
+                    std::vector<int64_t> refreshed;
                     for (const auto& i : times)
                     {
                         const auto j = p.frameTimes.find(i.first);
                         if (j != p.frameTimes.end() && j->second != i.second)
                         {
+                            if (!p.frameTimesArrived.count(i.first))
+                            {
+                                refreshed.push_back(i.first);
+                            }
                             if (const auto t = player->getTimeline()->getTimelineTime(
                                 timeRange.start_time(),
                                 OTIO_NS::RationalTime(static_cast<double>(i.first), rate)))
@@ -588,7 +640,23 @@ namespace djv
                             "djv::app::App",
                             ftk::Format("{0} frame(s) written over, read again").arg(changed.size()));
                     }
+                    if (!refreshed.empty())
+                    {
+                        report(framesReport("Refreshed", refreshed, path.getPad()));
+                    }
                 }
+                std::set<int64_t> arrived;
+                if (key == p.frameTimesPath && !p.frameTimes.empty())
+                {
+                    for (const auto& i : times)
+                    {
+                        if (!p.frameTimes.count(i.first))
+                        {
+                            arrived.insert(i.first);
+                        }
+                    }
+                }
+                p.frameTimesArrived = arrived;
                 p.frameTimes = times;
                 p.frameTimesPath = key;
             }

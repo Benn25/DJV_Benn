@@ -42,6 +42,7 @@ namespace djv
 
             std::shared_ptr<ftk::ListObserver<ftk::LogItem> > messagesObserver;
             std::shared_ptr<ftk::Observer<std::shared_ptr<tl::Player> > > playerObserver;
+            std::shared_ptr<ftk::Observer<std::string> > reportObserver;
             std::shared_ptr<ftk::Observer<std::string> > mediaReferenceKeyObserver;
             std::shared_ptr<ftk::Observer<int> > videoLayerObserver;
         };
@@ -128,6 +129,25 @@ namespace djv
                                 _messagesUpdate();
                             });
                     }
+                });
+
+            // A report shows where the messages do, for as long.
+            p.reportObserver = ftk::Observer<std::string>::create(
+                app->observeReport(),
+                [this](const std::string& value)
+                {
+                    FTK_P();
+                    if (value.empty())
+                        return;
+                    p.message = value;
+                    _messagesUpdate();
+                    p.messagesTimer->start(
+                        std::chrono::seconds(5),
+                        [this]
+                        {
+                            _p->message = std::string();
+                            _messagesUpdate();
+                        });
                 });
 
             p.playerObserver = ftk::Observer<std::shared_ptr<tl::Player> >::create(

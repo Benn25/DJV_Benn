@@ -309,6 +309,13 @@ namespace djv
             //! Observe the timeline player.
             DJV_APP_API std::shared_ptr<ftk::IObservable<std::shared_ptr<tl::Player> > > observePlayer() const;
 
+            //! Tell the user what just happened, in the status bar for a few
+            //! seconds, as Blender reports: e.g. a frame a render wrote.
+            DJV_APP_API void report(const std::string&);
+
+            //! Observe the reports.
+            DJV_APP_API std::shared_ptr<ftk::IObservable<std::string> > observeReport() const;
+
             //! Get the tool widget factory.
             DJV_APP_API const std::shared_ptr<ToolWidgetFactory>& getToolWidgetFactory() const;
 

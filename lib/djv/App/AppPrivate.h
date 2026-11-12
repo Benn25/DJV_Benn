@@ -40,6 +40,7 @@
 #include <future>
 #include <map>
 #include <optional>
+#include <set>
 
 namespace djv
 {
@@ -145,6 +146,10 @@ namespace djv
             std::string frameTimesPath;
             std::map<int64_t, int64_t> frameTimes;
             std::future<std::map<int64_t, int64_t> > frameTimesFuture;
+            //! The frames that appeared in the last listing: one still being
+            //! written then is written again by the next, which is its
+            //! arrival rather than a frame rendered again.
+            std::set<int64_t> frameTimesArrived;
             //! The files other runs hand over, opened here as tabs; see
             //! SingleInstance.h.
             std::unique_ptr<InstanceReceiver> instanceReceiver;
@@ -159,6 +164,7 @@ namespace djv
             //! since the files were last announced.
             bool filesChanged = false;
             std::shared_ptr<ftk::Observable<std::shared_ptr<tl::Player> > > player;
+            std::shared_ptr<ftk::Observable<std::string> > report;
             std::shared_ptr<ftk::Observable<std::optional<models::LayerStack> > > layerStack;
             std::shared_ptr<models::ColorModel> colorModel;
             std::shared_ptr<ui::ColorResetDialog> colorResetDialog;

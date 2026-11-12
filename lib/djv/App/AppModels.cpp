@@ -475,6 +475,7 @@ namespace djv
             FTK_P();
 
             p.player = ftk::Observable<std::shared_ptr<tl::Player> >::create();
+            p.report = ftk::Observable<std::string>::create();
             p.layerStack = ftk::Observable<std::optional<models::LayerStack> >::create();
 
             // The audio device's buffer size is the audio system's to give

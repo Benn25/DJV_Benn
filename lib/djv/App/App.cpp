@@ -588,6 +588,18 @@ namespace djv
             return _p->player;
         }
 
+        void App::report(const std::string& value)
+        {
+            // Always: the same report twice is two things that happened.
+            _p->report->setAlways(value);
+            _context->log("djv::app::App", value);
+        }
+
+        std::shared_ptr<ftk::IObservable<std::string> > App::observeReport() const
+        {
+            return _p->report;
+        }
+
         const std::shared_ptr<ToolWidgetFactory>& App::getToolWidgetFactory() const
         {
             return _p->toolWidgetFactory;

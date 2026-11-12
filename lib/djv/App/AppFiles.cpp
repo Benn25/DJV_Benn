@@ -38,6 +38,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <iomanip>
 #include <optional>
@@ -486,12 +487,12 @@ namespace djv
             {
                 return;
             }
+            _frameTimesCheck(player);
             const ftk::Path& path = player->getPath();
             if (!path.isSeq())
             {
                 return;
             }
-            _frameTimesCheck(player, path);
             ftk::PathOptions pathOptions;
             pathOptions.seqMaxDigits = imageSeq.maxDigits;
             const auto seq = ftk::findSeq(path, pathOptions);
@@ -605,40 +606,101 @@ namespace djv
             }
         }
 
-        void App::_frameTimesCheck(
-            const std::shared_ptr<tl::Player>& player,
-            const ftk::Path& path)
+        void App::_frameTimesCheck(const std::shared_ptr<tl::Player>& player)
         {
             FTK_P();
-            const std::string key = path.getDir() + path.getBase() + path.getExt();
+
+            // The sequences watched, and where each one's frames are on the
+            // player's timeline: the sequence shown, or each layer of a stack
+            // that is one, placed by its frame numbers and its offset.
+            const OTIO_NS::TimeRange& timeRange = player->getTimeRange();
+            const double rate = timeRange.duration().rate();
+            struct Seq
+            {
+                ftk::Path path;
+                std::function<std::optional<OTIO_NS::RationalTime>(int64_t)> toTime;
+            };
+            std::map<std::string, Seq> seqs;
+            const auto seqKey = [](const ftk::Path& path)
+            {
+                return path.getDir() + path.getBase() + path.getExt();
+            };
+            if (const auto& stack = p.layerStack->get())
+            {
+                for (const auto& layer : stack->layers)
+                {
+                    if (!layer.path.isSeq())
+                        continue;
+                    const double layerRate = layer.timeRange.duration().rate() > 0.0 ?
+                        layer.timeRange.duration().rate() :
+                        rate;
+                    const int64_t offset = layer.offset;
+                    seqs[seqKey(layer.path)] = Seq{
+                        layer.path,
+                        [rate, layerRate, offset](int64_t frame)
+                        {
+                            return std::optional<OTIO_NS::RationalTime>(
+                                OTIO_NS::RationalTime(static_cast<double>(frame), layerRate).
+                                rescaled_to(rate).floor() +
+                                OTIO_NS::RationalTime(static_cast<double>(offset), rate));
+                        } };
+                }
+            }
+            else if (player->getPath().isSeq())
+            {
+                const auto timeline = player->getTimeline();
+                const OTIO_NS::RationalTime start = timeRange.start_time();
+                seqs[seqKey(player->getPath())] = Seq{
+                    player->getPath(),
+                    [timeline, start, rate](int64_t frame)
+                    {
+                        return timeline->getTimelineTime(
+                            start,
+                            OTIO_NS::RationalTime(static_cast<double>(frame), rate));
+                    } };
+            }
+            std::string key;
+            for (const auto& i : seqs)
+            {
+                key += i.first + "\n";
+            }
 
             // The last listing, against the one before it.
             if (p.frameTimesFuture.valid() &&
                 std::future_status::ready == p.frameTimesFuture.wait_for(std::chrono::seconds(0)))
             {
                 const auto times = p.frameTimesFuture.get();
-                if (key == p.frameTimesPath && !p.frameTimes.empty())
+                const bool same = key == p.frameTimesPath && !key.empty();
+                std::vector<OTIO_NS::RationalTime> changed;
+                std::vector<int64_t> refreshed;
+                std::optional<OTIO_NS::RationalTime> refreshedLast;
+                int pad = 0;
+                std::map<std::string, std::set<int64_t> > arrived;
+                for (const auto& seqTimes : times)
                 {
-                    const OTIO_NS::TimeRange& timeRange = player->getTimeRange();
-                    const double rate = timeRange.duration().rate();
-                    std::vector<OTIO_NS::RationalTime> changed;
-                    std::vector<int64_t> refreshed;
-                    std::optional<OTIO_NS::RationalTime> refreshedLast;
-                    for (const auto& i : times)
+                    const auto seq = seqs.find(seqTimes.first);
+                    const auto before = p.frameTimes.find(seqTimes.first);
+                    if (!same || seq == seqs.end() || before == p.frameTimes.end() || before->second.empty())
+                        continue;
+                    const auto& arrivedBefore = p.frameTimesArrived[seqTimes.first];
+                    for (const auto& i : seqTimes.second)
                     {
-                        const auto j = p.frameTimes.find(i.first);
-                        if (j != p.frameTimes.end() && j->second != i.second)
+                        const auto j = before->second.find(i.first);
+                        if (j == before->second.end())
                         {
-                            const auto t = player->getTimeline()->getTimelineTime(
-                                timeRange.start_time(),
-                                OTIO_NS::RationalTime(static_cast<double>(i.first), rate));
+                            arrived[seqTimes.first].insert(i.first);
+                        }
+                        else if (j->second != i.second)
+                        {
+                            const auto t = seq->second.toTime(i.first);
                             if (t)
                             {
                                 changed.push_back(t.value());
                             }
-                            if (!p.frameTimesArrived.count(i.first))
+                            if (!arrivedBefore.count(i.first))
                             {
                                 refreshed.push_back(i.first);
+                                pad = std::max(pad, seq->second.path.getPad());
                                 if (t && (!refreshedLast || t.value() > refreshedLast.value()))
                                 {
                                     refreshedLast = t.value();
@@ -646,45 +708,34 @@ namespace djv
                             }
                         }
                     }
-                    if (!changed.empty())
-                    {
-                        player->removeVideoCache(changed);
-                        if (auto mainWindow = p.mainWindow)
-                        {
-                            mainWindow->getTimelineWidget()->refreshMedia();
-                        }
-                        _context->log(
-                            "djv::app::App",
-                            ftk::Format("{0} frame(s) written over, read again").arg(changed.size()));
-                    }
-                    if (!refreshed.empty())
-                    {
-                        const std::string text = framesReport("Refreshed", refreshed, path.getPad());
-                        report(text);
-                        if (auto mainWindow = p.mainWindow)
-                        {
-                            mainWindow->getViewport()->showReport(text, refreshedFramesColor);
-                            // How far it has been rendered again: the end of
-                            // the last frame written.
-                            if (refreshedLast)
-                            {
-                                ftk::Color4F color = refreshedFramesColor;
-                                color.a = .7F;
-                                mainWindow->getTimelineWidget()->setTimeMark(
-                                    refreshedLast.value() + OTIO_NS::RationalTime(1.0, rate),
-                                    color);
-                            }
-                        }
-                    }
                 }
-                std::set<int64_t> arrived;
-                if (key == p.frameTimesPath && !p.frameTimes.empty())
+                if (!changed.empty())
                 {
-                    for (const auto& i : times)
+                    player->removeVideoCache(changed);
+                    if (auto mainWindow = p.mainWindow)
                     {
-                        if (!p.frameTimes.count(i.first))
+                        mainWindow->getTimelineWidget()->refreshMedia();
+                    }
+                    _context->log(
+                        "djv::app::App",
+                        ftk::Format("{0} frame(s) written over, read again").arg(changed.size()));
+                }
+                if (!refreshed.empty())
+                {
+                    std::sort(refreshed.begin(), refreshed.end());
+                    refreshed.erase(std::unique(refreshed.begin(), refreshed.end()), refreshed.end());
+                    const std::string text = framesReport("Refreshed", refreshed, pad);
+                    report(text);
+                    if (auto mainWindow = p.mainWindow)
+                    {
+                        mainWindow->getViewport()->showReport(text, refreshedFramesColor);
+                        // How far it has been rendered again: the end of the
+                        // last frame written.
+                        if (refreshedLast)
                         {
-                            arrived.insert(i.first);
+                            mainWindow->getTimelineWidget()->setTimeMark(
+                                refreshedLast.value() + OTIO_NS::RationalTime(1.0, rate),
+                                refreshedFramesColor);
                         }
                     }
                 }
@@ -694,13 +745,23 @@ namespace djv
             }
 
             // The next listing, off the main thread.
-            if (!p.frameTimesFuture.valid())
+            if (!p.frameTimesFuture.valid() && !seqs.empty())
             {
+                std::vector<std::pair<std::string, ftk::Path> > paths;
+                for (const auto& i : seqs)
+                {
+                    paths.push_back({ i.first, i.second.path });
+                }
                 p.frameTimesFuture = std::async(
                     std::launch::async,
-                    [path]
+                    [paths]
                     {
-                        return readFrameTimes(path);
+                        std::map<std::string, std::map<int64_t, int64_t> > out;
+                        for (const auto& i : paths)
+                        {
+                            out[i.first] = readFrameTimes(i.second);
+                        }
+                        return out;
                     });
             }
         }

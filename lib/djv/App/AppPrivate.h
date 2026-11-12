@@ -143,13 +143,14 @@ namespace djv
             //! When each frame of the sequence shown was last written, by
             //! frame, read from its directory off the main thread: a frame
             //! written over -- part of a render done again -- is read again.
+            //! By sequence: the one shown, or each of a layer stack's.
             std::string frameTimesPath;
-            std::map<int64_t, int64_t> frameTimes;
-            std::future<std::map<int64_t, int64_t> > frameTimesFuture;
+            std::map<std::string, std::map<int64_t, int64_t> > frameTimes;
+            std::future<std::map<std::string, std::map<int64_t, int64_t> > > frameTimesFuture;
             //! The frames that appeared in the last listing: one still being
             //! written then is written again by the next, which is its
             //! arrival rather than a frame rendered again.
-            std::set<int64_t> frameTimesArrived;
+            std::map<std::string, std::set<int64_t> > frameTimesArrived;
             //! The files other runs hand over, opened here as tabs; see
             //! SingleInstance.h.
             std::unique_ptr<InstanceReceiver> instanceReceiver;

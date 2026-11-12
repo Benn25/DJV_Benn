@@ -407,9 +407,7 @@ namespace djv
             void _reload(bool restructured, bool keepCache = false);
             //! Read again the frames of the sequence shown that were written
             //! over since they were read.
-            void _frameTimesCheck(
-                const std::shared_ptr<tl::Player>&,
-                const ftk::Path&);
+            void _frameTimesCheck(const std::shared_ptr<tl::Player>&);
             void _autoReload();
             //! Open the files another run handed over.
             void _openHandedOver();

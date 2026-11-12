@@ -404,6 +404,8 @@ namespace djv
                 const std::shared_ptr<tl::Player>&,
                 const ftk::Path&);
             void _autoReload();
+            //! Open the files another run handed over.
+            void _openHandedOver();
             void _reloadUpdate(const std::shared_ptr<models::FilesModelItem>&);
             //! Thumbnails color managed as the viewport shows the picture.
             void _thumbnailColorUpdate();

@@ -30,6 +30,7 @@
 #include <ftk/Core/OS.h>
 #include <ftk/Core/Timer.h>
 
+#include <algorithm>
 #include <ctime>
 #include <ftk/Core/Path.h>
 #include <ftk/Core/String.h>
@@ -602,6 +603,69 @@ namespace djv
                         return readFrameTimes(path);
                     });
             }
+        }
+
+        void App::_openHandedOver()
+        {
+            FTK_P();
+            const std::vector<std::string> inputs = p.instanceReceiver->takePaths();
+            if (inputs.empty())
+            {
+                return;
+            }
+            ftk::PathOptions pathOptions;
+            pathOptions.seqMaxDigits = p.settingsModel->getImageSeq().maxDigits;
+            const auto key = [](const ftk::Path& path)
+            {
+                return ftk::toLower(path.hasNum() ?
+                    (path.getProtocol() + path.getDir() + path.getBase() + "#" + path.getExt()) :
+                    path.get());
+            };
+
+            // A file already open -- a frame of a sequence that is -- is
+            // shown rather than opened again: opening one frame of each of
+            // several from Explorer hands over each one.
+            const auto& files = p.filesModel->getFiles();
+            std::vector<ftk::Path> paths;
+            int shown = -1;
+            for (const auto& input : inputs)
+            {
+                ftk::Path path(input);
+                if (path.hasSeqWildcard())
+                {
+                    path = ftk::expandSeq(path, pathOptions);
+                }
+                const std::string pathKey = key(path);
+                const auto i = std::find_if(
+                    files.begin(),
+                    files.end(),
+                    [&key, &pathKey](const std::shared_ptr<models::FilesModelItem>& item)
+                    {
+                        return key(item->path) == pathKey;
+                    });
+                if (i != files.end())
+                {
+                    shown = static_cast<int>(i - files.begin());
+                }
+                else
+                {
+                    paths.push_back(path);
+                }
+            }
+            if (!paths.empty())
+            {
+                open(paths);
+            }
+            else if (shown >= 0)
+            {
+                p.filesModel->setA(shown);
+            }
+            p.instanceReceiver->raise();
+            _context->log(
+                "djv::app::App",
+                ftk::Format("Handed over by another run: {0} file(s), {1} opened").
+                arg(inputs.size()).
+                arg(paths.size()));
         }
 
         void App::_reload(bool restructured, bool keepCache)

@@ -273,6 +273,9 @@ namespace djv
             p.cmdLine.hideSetup = ftk::CmdLineFlag::create(
                 { "-hideSetup" },
                 "Hide the setup dialog that is shown on the first run.");
+            p.cmdLine.newInstance = ftk::CmdLineFlag::create(
+                { "-newInstance" },
+                "Open the files in a new instance rather than in the one already running.");
             p.cmdLine.version = ftk::CmdLineFlag::create(
                 { "-version" },
                 "Print the version and exit.");
@@ -344,6 +347,7 @@ namespace djv
                 p.cmdLine.usdDiskCacheGB,
 #endif // TLRENDER_USD
                 p.cmdLine.hideSetup,
+                p.cmdLine.newInstance,
                 p.cmdLine.version,
                 p.cmdLine.sysInfo,
                 p.cmdLine.listCommands,
@@ -717,6 +721,19 @@ namespace djv
             repairShellAssociations(_context);
 
             _mainWindowInit();
+
+            // From here the files other runs hand over open here. A timer
+            // rather than the window's message itself: the message comes
+            // in the middle of the event loop.
+            p.instanceReceiver = std::make_unique<InstanceReceiver>();
+            p.instanceTimer = ftk::Timer::create(_context);
+            p.instanceTimer->setRepeating(true);
+            p.instanceTimer->start(
+                std::chrono::milliseconds(100),
+                [this]
+                {
+                    _openHandedOver();
+                });
 
             if (p.cmdLine.listCommands->found())
             {

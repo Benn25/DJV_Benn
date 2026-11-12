@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/App.h>
+#include <djv/App/SingleInstance.h>
 
 #include <tlRender/UI/Init.h>
 
@@ -43,9 +44,13 @@ FTK_MAIN()
 #endif // _WIN32
     try
     {
+        auto args = ftk::convert(argc, argv);
+        // Before anything is set up: a run that hands its files to the
+        // DJV already open ends at once.
+        if (djv::app::forwardToRunningInstance(args))
+            return 0;
         auto context = ftk::Context::create();
         tl::ui::init(context);
-        auto args = ftk::convert(argc, argv);
         auto app = djv::app::App::create(context, args);
         if (app->hasCmdLineHelp())
             return 0;

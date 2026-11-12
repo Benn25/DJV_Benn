@@ -38,6 +38,7 @@ set(HEADERS
     ReviewTool.h
     SecondaryWindow.h
     SettingsTool.h
+    SingleInstance.h
     StatusBar.h
     SystemMemory.h
     WindowTransitions.h
@@ -105,6 +106,7 @@ set(SOURCE
     SecondaryWindow.cpp
     SettingsTool.cpp
     ShellAssociations.cpp
+    SingleInstance.cpp
     StatusBar.cpp
     SystemMemory.cpp
     WindowTransitions.cpp

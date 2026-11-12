@@ -4,6 +4,7 @@
 #pragma once
 
 #include <djv/App/App.h>
+#include <djv/App/SingleInstance.h>
 
 #include <djv/Models/AnnotationsModel.h>
 #include <djv/Models/SettingsKeys.h>
@@ -98,6 +99,7 @@ namespace djv
             std::shared_ptr<ftk::CmdLineOption<int> > usdDiskCacheGB;
 #endif // TLRENDER_USD
             std::shared_ptr<ftk::CmdLineFlag> hideSetup;
+            std::shared_ptr<ftk::CmdLineFlag> newInstance;
             std::shared_ptr<ftk::CmdLineFlag> version;
             std::shared_ptr<ftk::CmdLineFlag> sysInfo;
             std::shared_ptr<ftk::CmdLineFlag> listCommands;
@@ -143,6 +145,10 @@ namespace djv
             std::string frameTimesPath;
             std::map<int64_t, int64_t> frameTimes;
             std::future<std::map<int64_t, int64_t> > frameTimesFuture;
+            //! The files other runs hand over, opened here as tabs; see
+            //! SingleInstance.h.
+            std::unique_ptr<InstanceReceiver> instanceReceiver;
+            std::shared_ptr<ftk::Timer> instanceTimer;
             //! With DJV_CACHE_BENCH set, logs how fast the video cache fills.
             std::shared_ptr<ftk::Timer> cacheBenchTimer;
             std::chrono::steady_clock::time_point cacheBenchStart;

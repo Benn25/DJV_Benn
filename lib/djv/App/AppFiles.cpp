@@ -623,20 +623,26 @@ namespace djv
                     const double rate = timeRange.duration().rate();
                     std::vector<OTIO_NS::RationalTime> changed;
                     std::vector<int64_t> refreshed;
+                    std::optional<OTIO_NS::RationalTime> refreshedLast;
                     for (const auto& i : times)
                     {
                         const auto j = p.frameTimes.find(i.first);
                         if (j != p.frameTimes.end() && j->second != i.second)
                         {
+                            const auto t = player->getTimeline()->getTimelineTime(
+                                timeRange.start_time(),
+                                OTIO_NS::RationalTime(static_cast<double>(i.first), rate));
+                            if (t)
+                            {
+                                changed.push_back(t.value());
+                            }
                             if (!p.frameTimesArrived.count(i.first))
                             {
                                 refreshed.push_back(i.first);
-                            }
-                            if (const auto t = player->getTimeline()->getTimelineTime(
-                                timeRange.start_time(),
-                                OTIO_NS::RationalTime(static_cast<double>(i.first), rate)))
-                            {
-                                changed.push_back(t.value());
+                                if (t && (!refreshedLast || t.value() > refreshedLast.value()))
+                                {
+                                    refreshedLast = t.value();
+                                }
                             }
                         }
                     }
@@ -658,6 +664,16 @@ namespace djv
                         if (auto mainWindow = p.mainWindow)
                         {
                             mainWindow->getViewport()->showReport(text, refreshedFramesColor);
+                            // How far it has been rendered again: the end of
+                            // the last frame written.
+                            if (refreshedLast)
+                            {
+                                ftk::Color4F color = refreshedFramesColor;
+                                color.a = .7F;
+                                mainWindow->getTimelineWidget()->setTimeMark(
+                                    refreshedLast.value() + OTIO_NS::RationalTime(1.0, rate),
+                                    color);
+                            }
                         }
                     }
                 }

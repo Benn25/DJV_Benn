@@ -151,6 +151,10 @@ namespace djv
             //! written then is written again by the next, which is its
             //! arrival rather than a frame rendered again.
             std::map<std::string, std::set<int64_t> > frameTimesArrived;
+            //! The frames written again while the sequence has been shown: a
+            //! frame written again after the one before it was gives how
+            //! long it took to render.
+            std::map<std::string, std::set<int64_t> > frameTimesRefreshed;
             //! The files other runs hand over, opened here as tabs; see
             //! SingleInstance.h.
             std::unique_ptr<InstanceReceiver> instanceReceiver;

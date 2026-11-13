@@ -38,6 +38,8 @@
 
 #include <filesystem>
 #include <fstream>
+#include <cmath>
+#include <sstream>
 #include <functional>
 #include <iostream>
 #include <iomanip>
@@ -451,6 +453,18 @@ namespace djv
             const ftk::Color4F newFramesColor(.30F, .76F, .36F);
             const ftk::Color4F refreshedFramesColor(.68F, .84F, .22F);
 
+            //! Seconds to three significant digits: "0.254s", "4.23s",
+            //! "23.6s", "512s".
+            std::string secondsLabel(double value)
+            {
+                const int digits = value > 0.0 ?
+                    std::max(0, 2 - static_cast<int>(std::floor(std::log10(value)))) :
+                    0;
+                std::stringstream ss;
+                ss << std::fixed << std::setprecision(digits) << value << "s";
+                return ss.str();
+            }
+
             //! "New frame 0412", "Refreshed frames 0100-0105 (6)".
             std::string framesReport(const std::string& what, std::vector<int64_t> frames, int pad)
             {
@@ -674,7 +688,13 @@ namespace djv
                 std::vector<OTIO_NS::RationalTime> changed;
                 std::vector<int64_t> refreshed;
                 std::optional<OTIO_NS::RationalTime> refreshedLast;
+                std::string refreshedLastKey;
+                int64_t refreshedLastFrame = 0;
                 int pad = 0;
+                if (!same)
+                {
+                    p.frameTimesRefreshed.clear();
+                }
                 std::map<std::string, std::set<int64_t> > arrived;
                 for (const auto& seqTimes : times)
                 {
@@ -700,10 +720,13 @@ namespace djv
                             if (!arrivedBefore.count(i.first))
                             {
                                 refreshed.push_back(i.first);
+                                p.frameTimesRefreshed[seqTimes.first].insert(i.first);
                                 pad = std::max(pad, seq->second.path.getPad());
                                 if (t && (!refreshedLast || t.value() > refreshedLast.value()))
                                 {
                                     refreshedLast = t.value();
+                                    refreshedLastKey = seqTimes.first;
+                                    refreshedLastFrame = i.first;
                                 }
                             }
                         }
@@ -724,7 +747,25 @@ namespace djv
                 {
                     std::sort(refreshed.begin(), refreshed.end());
                     refreshed.erase(std::unique(refreshed.begin(), refreshed.end()), refreshed.end());
-                    const std::string text = framesReport("Refreshed", refreshed, pad);
+                    std::string text = framesReport("Refreshed", refreshed, pad);
+                    // How long the last of them took to render: since the
+                    // frame before it was written again, as a render writes
+                    // them one after the other.
+                    if (refreshedLast &&
+                        p.frameTimesRefreshed[refreshedLastKey].count(refreshedLastFrame - 1))
+                    {
+                        const auto& seqTimes = times.at(refreshedLastKey);
+                        const auto last = seqTimes.find(refreshedLastFrame);
+                        const auto prev = seqTimes.find(refreshedLastFrame - 1);
+                        if (last != seqTimes.end() && prev != seqTimes.end() && last->second > prev->second)
+                        {
+                            typedef std::filesystem::file_time_type::period Period;
+                            const double seconds =
+                                static_cast<double>(last->second - prev->second) *
+                                Period::num / Period::den;
+                            text += " (" + secondsLabel(seconds) + ")";
+                        }
+                    }
                     report(text);
                     if (auto mainWindow = p.mainWindow)
                     {

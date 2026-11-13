@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/ColorTool.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/App/App.h>
 #include <djv/UI/ColorWidgets.h>
@@ -70,7 +71,7 @@ namespace djv
             // Reset where the settings being reset are, as well as in the
             // menu: the tool is where somebody looks for it (DJV #687). The
             // same dialog either way.
-            p.resetButton = ftk::PushButton::create(context, "Reset");
+            p.resetButton = djv::ui::PushButton::create(context, "Reset");
             p.resetButton->setTooltip(
                 "Reset the color settings to their defaults, choosing which "
                 "sections to reset.");

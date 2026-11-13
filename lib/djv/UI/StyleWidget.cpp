@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/SettingsWidgets.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <ftk/UI/App.h>
 #include <djv/UI/CheckBox.h>
@@ -48,7 +49,7 @@ namespace djv
 
             p.settings = settings;
 
-            p.colorStyleComboBox = ftk::ComboBox::create(context, ftk::getColorStyleLabels());
+            p.colorStyleComboBox = djv::ui::ComboBox::create(context, ftk::getColorStyleLabels());
             p.colorStyleComboBox->setHStretch(ftk::Stretch::Expanding);
 
             p.brightnessSlider = djv::ui::FloatValueSlider::create(context);
@@ -59,7 +60,7 @@ namespace djv
             p.contrastSlider->setRange(.5F, 1.5F);
             p.contrastSlider->setDefault(1.F);
 
-            p.displayScaleComboBox = ftk::ComboBox::create(context, _getDisplayScaleLabels());
+            p.displayScaleComboBox = djv::ui::ComboBox::create(context, _getDisplayScaleLabels());
             p.displayScaleComboBox->setHStretch(ftk::Stretch::Expanding);
 
 

@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/ExportWidget.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/UI/ExportWidgets.h>
 #include <djv/Models/ColorModel.h>
@@ -181,7 +182,7 @@ namespace djv
             p.dirEdit = ftk::FileEdit::create(context, ftk::FileBrowserMode::Dir);
             ftk::setScreenshotTag(p.dirEdit, "Export.Dir");
 
-            p.renderSizeComboBox = ftk::ComboBox::create(context, models::getExportRenderSizeLabels());
+            p.renderSizeComboBox = djv::ui::ComboBox::create(context, models::getExportRenderSizeLabels());
             // "Default" is the one choice that is not a width, so it is the
             // one that needs saying.
             p.renderSizeComboBox->setTooltip(

@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/ReviewTool.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/App/App.h>
 #include <djv/App/MainWindow.h>
@@ -353,7 +354,7 @@ namespace djv
 
             // A push button: with no group behind it, a flat button with
             // only text reads as a label.
-            p.clearDrawingButton = ftk::PushButton::create(context, "Clear", toolLayout);
+            p.clearDrawingButton = djv::ui::PushButton::create(context, "Clear", toolLayout);
 
             auto sizeLayout = ftk::HorizontalLayout::create(context, drawingWidget);
             sizeLayout->setSpacingRole(ftk::SizeRole::SpacingSmall);

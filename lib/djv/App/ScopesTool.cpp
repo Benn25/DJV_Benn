@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/ScopesTool.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <ftk/UI/Settings.h>
 
@@ -46,7 +47,7 @@ namespace djv
                 parent);
             FTK_P();
 
-            p.sourceComboBox = ftk::ComboBox::create(
+            p.sourceComboBox = djv::ui::ComboBox::create(
                 context,
                 std::vector<std::string>{ "Display (after color management)", "File values" });
             p.sourceComboBox->setHStretch(ftk::Stretch::Expanding);

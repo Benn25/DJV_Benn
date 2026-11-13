@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/FilesTool.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/UI/FrameRangePopup.h>
 
@@ -140,7 +141,7 @@ namespace djv
 
             p.bButtonGroup = ftk::ButtonGroup::create(context, ftk::ButtonGroupType::Check);
 
-            p.compareComboBox = ftk::ComboBox::create(
+            p.compareComboBox = djv::ui::ComboBox::create(
                 context,
                 tl::getCompareLabels());
             p.compareComboBox->setHStretch(ftk::Stretch::Expanding);
@@ -171,7 +172,7 @@ namespace djv
                 "A compressed file differs from its source by a code value\n"
                 "or two, which is not distinguishable from black on its own.");
 
-            p.compareTimeComboBox = ftk::ComboBox::create(
+            p.compareTimeComboBox = djv::ui::ComboBox::create(
                 context,
                 models::getCompareTimeLabels());
             p.compareTimeComboBox->setTooltip(
@@ -605,7 +606,7 @@ namespace djv
                             ftk::SizeRole::SpacingSmall);
                         controls->setWidget(controlsLayout);
 
-                        widget.layerComboBox = ftk::ComboBox::create(context, controlsLayout);
+                        widget.layerComboBox = djv::ui::ComboBox::create(context, controlsLayout);
                         widget.layerComboBox->setItems(item->videoLayers);
                         widget.layerComboBox->setCurrentIndex(item->videoLayer);
                         widget.layerComboBox->setVAlign(ftk::VAlign::Center);
@@ -631,7 +632,7 @@ namespace djv
                         // For an OTIO timeline whose clips carry several
                         // versions of their media, e.g. "Full" and "Proxy".
                         // The keys are known once the file has been opened.
-                        widget.mediaReferenceComboBox = ftk::ComboBox::create(context, controlsLayout);
+                        widget.mediaReferenceComboBox = djv::ui::ComboBox::create(context, controlsLayout);
                         widget.mediaReferenceComboBox->setItems(mediaReferenceItems(*item));
                         widget.mediaReferenceComboBox->setCurrentIndex(mediaReferenceIndex(*item));
                         widget.mediaReferenceComboBox->setVAlign(ftk::VAlign::Center);

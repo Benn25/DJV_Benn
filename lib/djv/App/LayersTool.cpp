@@ -2,6 +2,8 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/LayersTool.h>
+#include <djv/UI/FluidButtons.h>
+#include <djv/UI/WrapLabel.h>
 
 #include <djv/App/App.h>
 #include <djv/App/MainWindow.h>
@@ -38,7 +40,7 @@ namespace djv
             std::shared_ptr<ftk::PushButton> newButton;
             std::shared_ptr<ftk::PushButton> addButton;
             std::shared_ptr<ftk::PushButton> saveButton;
-            std::shared_ptr<ftk::Label> infoLabel;
+            std::shared_ptr<djv::ui::WrapLabel> infoLabel;
             std::shared_ptr<ftk::VerticalLayout> rowsLayout;
             std::shared_ptr<ftk::VerticalLayout> layout;
 
@@ -72,25 +74,25 @@ namespace djv
             p.pendingTimer = ftk::Timer::create(context);
             p.infoTimer = ftk::Timer::create(context);
 
-            p.newButton = ftk::PushButton::create(context, "Stack Open Files");
+            p.newButton = djv::ui::PushButton::create(context, "Stack Open Files");
             p.newButton->setIcon("FileNew");
             p.newButton->setTooltip(
                 "Stack the open files as layers, in a new layer stack.\n"
                 "Pictures without alpha (JPG, movies) go to the bottom, and "
                 "every layer is placed by its own frame numbers.");
-            p.addButton = ftk::PushButton::create(context, "Add Layers...");
+            p.addButton = djv::ui::PushButton::create(context, "Add Layers...");
             p.addButton->setIcon("Add");
             p.addButton->setTooltip(
                 "Choose files to add on top of the current layer stack.\n"
                 "Selecting every frame of a sequence adds it once.");
 
-            p.saveButton = ftk::PushButton::create(context, "Save As...");
+            p.saveButton = djv::ui::PushButton::create(context, "Save As...");
             p.saveButton->setIcon("FileSave");
             p.saveButton->setTooltip(
                 "Save the layer stack where you want it, as an OpenTimelineIO "
                 "file, to open again later.");
 
-            p.infoLabel = ftk::Label::create(context);
+            p.infoLabel = djv::ui::WrapLabel::create(context);
             p.infoLabel->setMarginRole(ftk::SizeRole::MarginSmall);
 
             p.layout = ftk::VerticalLayout::create(context);
@@ -392,7 +394,7 @@ namespace djv
                 offsetEdit->setTooltip(
                     "Frames to move the layer by: later when positive, earlier "
                     "when negative.");
-                auto colorSpaceComboBox = ftk::ComboBox::create(context, colorSpaceItems, bottomLayout);
+                auto colorSpaceComboBox = djv::ui::ComboBox::create(context, colorSpaceItems, bottomLayout);
                 colorSpaceComboBox->setHStretch(ftk::Stretch::Expanding);
                 colorSpaceComboBox->setTooltip(
                     "The layer's input color space.\n"

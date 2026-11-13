@@ -3,6 +3,7 @@
 
 #include <djv/UI/ScopesWidget.h>
 
+#include <djv/UI/Fluid.h>
 #include <djv/UI/PixelProbe.h>
 
 #include <djv/Models/ColorModel.h>
@@ -17,10 +18,6 @@
 #if defined(TLRENDER_OCIO)
 #include <OpenColorIO/OpenColorIO.h>
 #endif // TLRENDER_OCIO
-
-#if defined(FTK_SDL3)
-#include <SDL3/SDL.h>
-#endif // FTK_SDL3
 
 #include <algorithm>
 #include <chrono>
@@ -68,31 +65,8 @@ namespace djv
             //! screen the window is on: a fixed width was a large part of a
             //! 1080p screen, as a remote session has, and a small part of a
             //! 4K one.
-            const float minWidthOfScreen = .12F;
+            const float minWidthOfScreen = .078F;
 
-            //! The width of the screen the main window is on, in pixels; zero
-            //! when it cannot be found.
-            int getScreenWidth()
-            {
-                int out = 0;
-#if defined(FTK_SDL3)
-                int count = 0;
-                if (SDL_Window** windows = SDL_GetWindows(&count))
-                {
-                    if (count > 0)
-                    {
-                        if (const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(
-                            SDL_GetDisplayForWindow(windows[0])))
-                        {
-                            out = static_cast<int>(std::lround(
-                                mode->w * (mode->pixel_density > 0.F ? mode->pixel_density : 1.F)));
-                        }
-                    }
-                    SDL_free(windows);
-                }
-#endif // FTK_SDL3
-                return out;
-            }
 
             std::shared_ptr<ftk::Image> createImage(int w, int h)
             {

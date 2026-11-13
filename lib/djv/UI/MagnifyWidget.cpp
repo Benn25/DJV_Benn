@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/MagnifyWidget.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/UI/ViewportBinding.h>
 
@@ -94,7 +95,7 @@ namespace djv
             p.viewport = tl::ui::Viewport::create(context);
             p.viewport->setInputEnabled(false);
 
-            p.comboBox = ftk::ComboBox::create(context, getMagnifyLevelLabels());
+            p.comboBox = djv::ui::ComboBox::create(context, getMagnifyLevelLabels());
             p.comboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.comboBox, "Magnify.Magnify");
 

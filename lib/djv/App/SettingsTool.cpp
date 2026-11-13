@@ -2,6 +2,8 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/SettingsTool.h>
+#include <djv/UI/FluidButtons.h>
+#include <djv/UI/WrapLabel.h>
 
 #include <djv/App/App.h>
 #include <djv/UI/SettingsWidgets.h>
@@ -69,7 +71,7 @@ namespace djv
             p.bellows["OTIO"] = djv::ui::SubPanel::create(context, "OTIO", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
-            ftk::Label::create(
+            djv::ui::WrapLabel::create(
                 context,
                 "Changes are applied to new files.",
                 vLayout2);
@@ -91,7 +93,7 @@ namespace djv
             p.bellows["Audio"] = djv::ui::SubPanel::create(context, "Audio", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
-            ftk::Label::create(
+            djv::ui::WrapLabel::create(
                 context,
                 "Changes are applied to new files.",
                 vLayout2);
@@ -120,7 +122,7 @@ namespace djv
             p.bellows["FFmpeg"] = djv::ui::SubPanel::create(context, "FFmpeg", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
-            ftk::Label::create(
+            djv::ui::WrapLabel::create(
                 context,
                 "Changes are applied to new files.",
                 vLayout2);
@@ -132,11 +134,11 @@ namespace djv
             p.bellows["USD"] = djv::ui::SubPanel::create(context, "USD", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
-            ftk::Label::create(
+            djv::ui::WrapLabel::create(
                 context,
                 "Universal scene description (USD) settings.",
                 vLayout2);
-            ftk::Label::create(
+            djv::ui::WrapLabel::create(
                 context,
                 "Changes are applied to new files.",
                 vLayout2);
@@ -145,10 +147,10 @@ namespace djv
 #endif // TLRENDER_USD
 
 
-            p.saveButton = ftk::PushButton::create(context, "Save");
+            p.saveButton = djv::ui::PushButton::create(context, "Save");
             p.saveButton->setTooltip("Save the settings. Settings are also saved on exit.");
 
-            p.resetButton = ftk::PushButton::create(context, "Reset");
+            p.resetButton = djv::ui::PushButton::create(context, "Reset");
             p.resetButton->setTooltip("Restore settings to default values.");
 
             p.layout = ftk::VerticalLayout::create(context);

@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/ColorWidgets.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/Models/BlenderConfig.h>
 #include <djv/Models/ColorModel.h>
@@ -121,7 +122,7 @@ namespace djv
             p.enabledCheckBox->setTooltip("Toggle whether OCIO is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "Color.OCIO.Enabled");
 
-            p.blenderComboBox = ftk::ComboBox::create(context);
+            p.blenderComboBox = djv::ui::ComboBox::create(context);
             p.blenderComboBox->setHStretch(ftk::Stretch::Expanding);
             p.blenderComboBox->setTooltip(
                 "Use the color configuration of a Blender installation: the same "
@@ -135,7 +136,7 @@ namespace djv
                 "folder is remembered.");
             ftk::setScreenshotTag(p.blenderDirEdit, "Color.OCIO.BlenderDir");
 
-            p.configComboBox = ftk::ComboBox::create(context, tl::getOCIOConfigLabels());
+            p.configComboBox = djv::ui::ComboBox::create(context, tl::getOCIOConfigLabels());
             p.configComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.configComboBox, "Color.OCIO.Config");
 
@@ -144,7 +145,7 @@ namespace djv
             p.nameLabel = ftk::Label::create(context);
             ftk::setScreenshotTag(p.nameLabel, "Color.OCIO.Name");
 
-            p.inputComboBox = ftk::ComboBox::create(context);
+            p.inputComboBox = djv::ui::ComboBox::create(context);
             p.inputComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.inputComboBox, "Color.OCIO.Input");
 
@@ -157,15 +158,15 @@ namespace djv
                 "their own media.");
             ftk::setScreenshotTag(p.resolvedLabel, "Color.OCIO.Resolved");
 
-            p.displayComboBox = ftk::ComboBox::create(context);
+            p.displayComboBox = djv::ui::ComboBox::create(context);
             p.displayComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.displayComboBox, "Color.OCIO.Display");
 
-            p.viewComboBox = ftk::ComboBox::create(context);
+            p.viewComboBox = djv::ui::ComboBox::create(context);
             p.viewComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.viewComboBox, "Color.OCIO.View");
 
-            p.lookComboBox = ftk::ComboBox::create(context);
+            p.lookComboBox = djv::ui::ComboBox::create(context);
             p.lookComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.lookComboBox, "Color.OCIO.Look");
 
@@ -186,7 +187,7 @@ namespace djv
                         return ocioExts.find(value) == ocioExts.end();
                     }),
                 p.exts.end());
-            p.extAddExtComboBox = ftk::ComboBox::create(context, p.exts);
+            p.extAddExtComboBox = djv::ui::ComboBox::create(context, p.exts);
             // The list is sorted; the extension offered first is the one most
             // likely to want a color space of its own.
             const auto exr = std::find(p.exts.begin(), p.exts.end(), ".exr");
@@ -199,7 +200,7 @@ namespace djv
                 "File name extension to assign a color space to.");
             ftk::setScreenshotTag(p.extAddExtComboBox, "Color.OCIO.ExtAdd");
 
-            p.extAddColorSpaceComboBox = ftk::ComboBox::create(context);
+            p.extAddColorSpaceComboBox = djv::ui::ComboBox::create(context);
             p.extAddColorSpaceComboBox->setHStretch(ftk::Stretch::Expanding);
             p.extAddColorSpaceComboBox->setTooltip(
                 "Color space to assign to the extension.");
@@ -514,7 +515,7 @@ namespace djv
                     auto hLayout = ftk::HorizontalLayout::create(context);
                     hLayout->setSpacingRole(ftk::SizeRole::SpacingSmall);
 
-                    auto comboBox = ftk::ComboBox::create(context, p.colorSpaces, hLayout);
+                    auto comboBox = djv::ui::ComboBox::create(context, p.colorSpaces, hLayout);
                     comboBox->setHStretch(ftk::Stretch::Expanding);
                     const auto j = std::find(p.colorSpaces.begin(), p.colorSpaces.end(), i.second);
                     comboBox->setCurrentIndex(
@@ -587,7 +588,7 @@ namespace djv
             p.fileEdit->setTooltip(ftk::Format("Supported LUT formats:\n{0}").arg(ftk::join(s, '\n')));
             ftk::setScreenshotTag(p.fileEdit, "Color.LUT.File");
 
-            p.directionComboBox = ftk::ComboBox::create(context, tl::getLUTDirectionLabels());
+            p.directionComboBox = djv::ui::ComboBox::create(context, tl::getLUTDirectionLabels());
             p.directionComboBox->setHStretch(ftk::Stretch::Expanding);
             p.directionComboBox->setTooltip(
                 "The direction the LUT is applied in.\n\n"
@@ -596,7 +597,7 @@ namespace djv
                 "correcting the display with one takes Inverse.");
             ftk::setScreenshotTag(p.directionComboBox, "Color.LUT.Direction");
 
-            p.orderComboBox = ftk::ComboBox::create(context, tl::getLUTOrderLabels());
+            p.orderComboBox = djv::ui::ComboBox::create(context, tl::getLUTOrderLabels());
             p.orderComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.orderComboBox, "Color.LUT.Order");
 

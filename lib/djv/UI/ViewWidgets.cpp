@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/ViewWidgets.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/Models/ViewportModel.h>
 
@@ -63,7 +64,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewOptionsWidget", parent);
             FTK_P();
 
-            p.channelsComboBox = ftk::ComboBox::create(
+            p.channelsComboBox = djv::ui::ComboBox::create(
                 context,
                 ftk::getChannelDisplayLabels());
             p.channelsComboBox->setHStretch(ftk::Stretch::Expanding);
@@ -80,19 +81,19 @@ namespace djv
             p.mirrorYCheckBox->setParent(mirrorLayout);
             ftk::setScreenshotTag(mirrorLayout, "View.Options.Mirror");
 
-            p.minifyComboBox = ftk::ComboBox::create(
+            p.minifyComboBox = djv::ui::ComboBox::create(
                 context,
                 ftk::getImageFilterLabels());
             p.minifyComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.minifyComboBox, "View.Options.Minify");
 
-            p.magnifyComboBox = ftk::ComboBox::create(
+            p.magnifyComboBox = djv::ui::ComboBox::create(
                 context,
                 ftk::getImageFilterLabels());
             p.magnifyComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.magnifyComboBox, "View.Options.Magnify");
 
-            p.videoLevelsComboBox = ftk::ComboBox::create(
+            p.videoLevelsComboBox = djv::ui::ComboBox::create(
                 context,
                 ftk::getInputVideoLevelsLabels());
             p.videoLevelsComboBox->setHStretch(ftk::Stretch::Expanding);
@@ -105,7 +106,7 @@ namespace djv
             {
                 alphaBlendLabels.push_back(label);
             }
-            p.alphaBlendComboBox = ftk::ComboBox::create(
+            p.alphaBlendComboBox = djv::ui::ComboBox::create(
                 context,
                 alphaBlendLabels);
             p.alphaBlendComboBox->setTooltip(
@@ -122,7 +123,7 @@ namespace djv
                 ss << p.colorBuffers[i];
                 items.push_back(ss.str());
             }
-            p.colorBufferComboBox = ftk::ComboBox::create(context, items);
+            p.colorBufferComboBox = djv::ui::ComboBox::create(context, items);
             p.colorBufferComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.colorBufferComboBox, "View.Options.ColorBuffer");
 
@@ -308,7 +309,7 @@ namespace djv
             p.edit->setFormat("0.00:0");
             p.edit->getModel()->setRegex("[0-9\\.\\:]*");
 
-            p.typeComboBox = ftk::ComboBox::create(context, tl::getAspectRatioTypeLabels());
+            p.typeComboBox = djv::ui::ComboBox::create(context, tl::getAspectRatioTypeLabels());
             p.typeComboBox->setHStretch(ftk::Stretch::Expanding);
 
             p.layout = ftk::HorizontalLayout::create(context);
@@ -534,7 +535,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewBackgroundWidget", parent);
             FTK_P();
 
-            p.typeComboBox = ftk::ComboBox::create(
+            p.typeComboBox = djv::ui::ComboBox::create(
                 context,
                 tl::getBackgroundLabels());
             p.typeComboBox->setHStretch(ftk::Stretch::Expanding);
@@ -797,7 +798,7 @@ namespace djv
             p.enabledCheckBox->setTooltip("Toggle whether the grid is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.Grid.Enabled");
 
-            p.cellModeComboBox = ftk::ComboBox::create(context, tl::getGridCellModeLabels());
+            p.cellModeComboBox = djv::ui::ComboBox::create(context, tl::getGridCellModeLabels());
             ftk::setScreenshotTag(p.cellModeComboBox, "View.Grid.CellMode");
 
             p.cellSizeSlider = djv::ui::IntValueSlider::create(context);
@@ -819,7 +820,7 @@ namespace djv
             p.colorSwatch->setEditable(true);
             p.colorSwatch->setHAlign(ftk::HAlign::Left);
 
-            p.labelsComboBox = ftk::ComboBox::create(context, tl::getGridLabelsLabels());
+            p.labelsComboBox = djv::ui::ComboBox::create(context, tl::getGridLabelsLabels());
             ftk::setScreenshotTag(p.labelsComboBox, "View.Grid.Labels");
 
             p.textColorSwatch = ftk::ColorSwatch::create(context);
@@ -1105,7 +1106,7 @@ namespace djv
             p.enabledCheckBox->setTooltip("Toggle whether the clipping warning is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.ClippingWarning.Enabled");
 
-            p.modeComboBox = ftk::ComboBox::create(context, tl::getClippingWarningModeLabels());
+            p.modeComboBox = djv::ui::ComboBox::create(context, tl::getClippingWarningModeLabels());
             p.modeComboBox->setHStretch(ftk::Stretch::Expanding);
             p.modeComboBox->setTooltip(
                 "What is compared with the range.\n"
@@ -1238,7 +1239,7 @@ namespace djv
             const auto enums = models::getHUDItemEnums();
             for (const auto i : enums)
             {
-                p.posComboBoxes[i] = ftk::ComboBox::create(context, models::getHUDPosLabels());
+                p.posComboBoxes[i] = djv::ui::ComboBox::create(context, models::getHUDPosLabels());
                 p.posComboBoxes[i]->setHStretch(ftk::Stretch::Expanding);
             }
             ftk::setScreenshotTag(p.posComboBoxes[models::HUDItem::FileName], "View.HUD.FileName");

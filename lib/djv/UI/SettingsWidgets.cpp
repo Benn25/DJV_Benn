@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/SettingsWidgets.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/Models/TimeUnitsModel.h>
 
@@ -434,7 +435,7 @@ namespace djv
 
             p.settings = settings;
 
-            p.spatialComboBox = ftk::ComboBox::create(context, tl::getSpatialLabels());
+            p.spatialComboBox = djv::ui::ComboBox::create(context, tl::getSpatialLabels());
             p.spatialComboBox->setHStretch(ftk::Stretch::Expanding);
             p.spatialComboBox->setTooltip(
                 "Use the spatial coordinates in OTIO files to position and\n"
@@ -538,7 +539,7 @@ namespace djv
 
             p.settings = settings;
 
-            p.audioComboBox = ftk::ComboBox::create(context, tl::getImageSeqAudioLabels());
+            p.audioComboBox = djv::ui::ComboBox::create(context, tl::getImageSeqAudioLabels());
             p.audioComboBox->setHStretch(ftk::Stretch::Expanding);
             p.audioComboBox->setTooltip(
                 "Open audio files for image sequences.\n"
@@ -565,7 +566,7 @@ namespace djv
             p.defaultSpeedEdit = ftk::DoubleEdit::create(context);
             p.defaultSpeedEdit->setRange(1.0, 120.0);
 
-            p.missingFramesComboBox = ftk::ComboBox::create(
+            p.missingFramesComboBox = djv::ui::ComboBox::create(
                 context, tl::getMissingFramesLabels());
             p.missingFramesComboBox->setHStretch(ftk::Stretch::Expanding);
             p.missingFramesComboBox->setTooltip(
@@ -836,11 +837,11 @@ namespace djv
 
             for (const auto mouseAction : models::getMouseActionEnums())
             {
-                p.buttonComboBoxes[mouseAction] = ftk::ComboBox::create(
+                p.buttonComboBoxes[mouseAction] = djv::ui::ComboBox::create(
                     context,
                     ftk::getMouseButtonLabels());
                 p.buttonComboBoxes[mouseAction]->setHStretch(ftk::Stretch::Expanding);
-                p.modifierComboBoxes[mouseAction] = ftk::ComboBox::create(context, p.modifierLabels);
+                p.modifierComboBoxes[mouseAction] = djv::ui::ComboBox::create(context, p.modifierLabels);
                 p.modifierComboBoxes[mouseAction]->setHStretch(ftk::Stretch::Expanding);
             }
 
@@ -849,7 +850,7 @@ namespace djv
             // the information that these ride the wheel.
             for (const auto wheelAction : models::getWheelActionEnums())
             {
-                p.wheelComboBoxes[wheelAction] = ftk::ComboBox::create(context, p.modifierLabels);
+                p.wheelComboBoxes[wheelAction] = djv::ui::ComboBox::create(context, p.modifierLabels);
                 p.wheelComboBoxes[wheelAction]->setHStretch(ftk::Stretch::Expanding);
             }
 
@@ -1112,7 +1113,7 @@ namespace djv
 
             p.timeUnitsModel = timeUnitsModel;
 
-            p.timeUnitsComboBox = ftk::ComboBox::create(context, tl::getTimeUnitsLabels());
+            p.timeUnitsComboBox = djv::ui::ComboBox::create(context, tl::getTimeUnitsLabels());
 
             p.layout = ftk::FormLayout::create(context);
 
@@ -1428,7 +1429,7 @@ namespace djv
             p.complexitySlider = djv::ui::FloatValueSlider::create(context);
             p.complexitySlider->setDefault(tl::usd::Options().complexity);
 
-            p.drawModeComboBox = ftk::ComboBox::create(context, tl::usd::getDrawModeLabels());
+            p.drawModeComboBox = djv::ui::ComboBox::create(context, tl::usd::getDrawModeLabels());
             p.drawModeComboBox->setHStretch(ftk::Stretch::Expanding);
 
             p.lightingCheckBox = djv::ui::CheckBox::create(context);

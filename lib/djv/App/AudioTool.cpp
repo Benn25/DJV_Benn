@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/App/AudioTool.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/App/App.h>
 #include <djv/Models/AudioModel.h>
@@ -58,7 +59,7 @@ namespace djv
                 parent);
             FTK_P();
 
-            p.deviceComboBox = ftk::ComboBox::create(context);
+            p.deviceComboBox = djv::ui::ComboBox::create(context);
             p.deviceComboBox->setTooltip("Audio output device");
             ftk::setScreenshotTag(p.deviceComboBox, "Audio.Device");
 
@@ -72,7 +73,7 @@ namespace djv
             p.muteCheckBox = djv::ui::CheckBox::create(context);
             ftk::setScreenshotTag(p.muteCheckBox, "Audio.Mute");
 
-            p.channelComboBox = ftk::ComboBox::create(context);
+            p.channelComboBox = djv::ui::ComboBox::create(context);
             p.channelComboBox->setTooltip("Audio channel to play");
             ftk::setScreenshotTag(p.channelComboBox, "Audio.Channel");
 

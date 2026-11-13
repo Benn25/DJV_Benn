@@ -2,6 +2,7 @@
 // Copyright Contributors to the DJV project.
 
 #include <djv/UI/ExportWidgets.h>
+#include <djv/UI/FluidButtons.h>
 
 #include <djv/Models/TimeUnitsModel.h>
 
@@ -275,7 +276,7 @@ namespace djv
             p.fileNameEdit->setTooltip(getFileNameTooltip(
                 models::ExportFileType::Image));
             ftk::setScreenshotTag(p.fileNameEdit, "Export.ImageFileName");
-            p.extComboBox = ftk::ComboBox::create(context, p.exts);
+            p.extComboBox = djv::ui::ComboBox::create(context, p.exts);
             p.extComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.extComboBox, "Export.ImageExt");
 
@@ -285,7 +286,7 @@ namespace djv
             p.fileLabel->setElide(true, ftk::ElideMode::Middle);
             p.fileLabel->setHStretch(ftk::Stretch::Expanding);
 
-            p.exportButton = ftk::PushButton::create(context, "Export Image");
+            p.exportButton = djv::ui::PushButton::create(context, "Export Image");
             ftk::setScreenshotTag(p.exportButton, "Export.ImageExport");
 
             p.layout = ftk::VerticalLayout::create(context);
@@ -465,7 +466,7 @@ namespace djv
             p.fileNameEdit->setTooltip(getFileNameTooltip(
                 models::ExportFileType::Seq));
             ftk::setScreenshotTag(p.fileNameEdit, "Export.SeqFileName");
-            p.extComboBox = ftk::ComboBox::create(context, p.exts);
+            p.extComboBox = djv::ui::ComboBox::create(context, p.exts);
             p.extComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.extComboBox, "Export.SeqExt");
 
@@ -476,7 +477,7 @@ namespace djv
             p.fileLabel->setHStretch(ftk::Stretch::Expanding);
             p.rangeLabel = ftk::Label::create(context);
 
-            p.exportButton = ftk::PushButton::create(context, "Export Sequence");
+            p.exportButton = djv::ui::PushButton::create(context, "Export Sequence");
             ftk::setScreenshotTag(p.exportButton, "Export.SeqExport");
 
             p.layout = ftk::VerticalLayout::create(context);
@@ -699,13 +700,13 @@ namespace djv
                 models::ExportFileType::Movie));
             ftk::setScreenshotTag(p.fileNameEdit, "Export.MovieFileName");
             p.presetExts = p.exts;
-            p.extComboBox = ftk::ComboBox::create(context, p.presetExts);
+            p.extComboBox = djv::ui::ComboBox::create(context, p.presetExts);
             p.extComboBox->setHStretch(ftk::Stretch::Expanding);
             p.extComboBox->setTooltip(
                 "The file type to write. Only the ones the preset is "
                 "written to are listed.");
             ftk::setScreenshotTag(p.extComboBox, "Export.MovieExt");
-            p.audioCodecComboBox = ftk::ComboBox::create(context, p.audioCodecs);
+            p.audioCodecComboBox = djv::ui::ComboBox::create(context, p.audioCodecs);
             p.audioCodecComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.audioCodecComboBox, "Export.MovieAudioCodec");
 #if defined(TLRENDER_FFMPEG_PLUGIN)
@@ -720,7 +721,7 @@ namespace djv
                 p.presets.push_back(preset.name);
             }
 #endif // TLRENDER_FFMPEG_PLUGIN
-            p.presetComboBox = ftk::ComboBox::create(context, p.presets);
+            p.presetComboBox = djv::ui::ComboBox::create(context, p.presets);
             p.presetComboBox->setHStretch(ftk::Stretch::Expanding);
             p.presetComboBox->setTooltip(
                 "What to export. The command line presets use the FFmpeg "
@@ -742,7 +743,7 @@ namespace djv
             p.fileLabel->setHStretch(ftk::Stretch::Expanding);
             p.rangeLabel = ftk::Label::create(context);
 
-            p.exportButton = ftk::PushButton::create(context, "Export Movie");
+            p.exportButton = djv::ui::PushButton::create(context, "Export Movie");
             ftk::setScreenshotTag(p.exportButton, "Export.MovieExport");
 
             p.layout = ftk::VerticalLayout::create(context);

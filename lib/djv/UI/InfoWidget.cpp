@@ -7,7 +7,7 @@
 
 #include <tlRender/Timeline/Player.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/ClipboardSystem.h>
 #include <ftk/UI/Settings.h>
 #include <ftk/UI/TextEdit.h>
@@ -36,7 +36,7 @@ namespace djv
 
             //! One per section, in the order they are shown.
             std::vector<std::string> sectionNames;
-            std::map<std::string, std::shared_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::shared_ptr<djv::ui::SubPanel> > bellows;
             std::map<std::string, std::shared_ptr<ftk::TextEdit> > textEdits;
             std::shared_ptr<ftk::SearchBox> searchBox;
 
@@ -93,7 +93,7 @@ namespace djv
                 // scrolling inside itself.
                 textEdit->setSizeHintRole(ftk::SizeRole::None);
                 p.textEdits[name] = textEdit;
-                p.bellows[name] = ftk::Bellows::create(context, name, layout);
+                p.bellows[name] = djv::ui::SubPanel::create(context, name, layout);
                 p.bellows[name]->setWidget(textEdit);
                 // Open until the settings say otherwise, so that a tool
                 // opened for the first time shows what it has.

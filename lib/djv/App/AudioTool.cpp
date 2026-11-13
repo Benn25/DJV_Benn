@@ -7,12 +7,11 @@
 #include <djv/Models/AudioModel.h>
 #include <djv/Models/FilesModel.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
-#include <ftk/UI/DoubleEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/FormLayout.h>
-#include <ftk/UI/IntEditSlider.h>
 #include <ftk/UI/RowLayout.h>
 #include <ftk/UI/ScreenshotTag.h>
 #include <ftk/Core/Format.h>
@@ -28,10 +27,10 @@ namespace djv
             int channel = -1;
 
             std::shared_ptr<ftk::ComboBox> deviceComboBox;
-            std::shared_ptr<ftk::IntEditSlider> volumeSlider;
+            std::shared_ptr<djv::ui::IntValueSlider> volumeSlider;
             std::shared_ptr<ftk::CheckBox> muteCheckBox;
             std::shared_ptr<ftk::ComboBox> channelComboBox;
-            std::shared_ptr<ftk::DoubleEditSlider> syncOffsetSlider;
+            std::shared_ptr<djv::ui::DoubleValueSlider> syncOffsetSlider;
 
             std::shared_ptr<ftk::ListObserver<tl::AudioDeviceID> > devicesObserver;
             std::shared_ptr<ftk::Observer<tl::AudioDeviceID> > deviceObserver;
@@ -62,7 +61,8 @@ namespace djv
             p.deviceComboBox->setTooltip("Audio output device");
             ftk::setScreenshotTag(p.deviceComboBox, "Audio.Device");
 
-            p.volumeSlider = ftk::IntEditSlider::create(context);
+            p.volumeSlider = djv::ui::IntValueSlider::create(context);
+            p.volumeSlider->setDefault(100);
             p.volumeSlider->setRange(0, 100);
             p.volumeSlider->setStep(1);
             p.volumeSlider->setLargeStep(10);
@@ -75,7 +75,7 @@ namespace djv
             p.channelComboBox->setTooltip("Audio channel to play");
             ftk::setScreenshotTag(p.channelComboBox, "Audio.Channel");
 
-            p.syncOffsetSlider = ftk::DoubleEditSlider::create(context);
+            p.syncOffsetSlider = djv::ui::DoubleValueSlider::create(context);
             p.syncOffsetSlider->setRange(-1.0, 1.0);
             p.syncOffsetSlider->setDefault(0.0);
             p.syncOffsetSlider->getModel()->setRangeSoft(true);

@@ -18,7 +18,7 @@ namespace djv
     {
         struct ColorTool::Private
         {
-            std::map<std::string, std::shared_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::shared_ptr<djv::ui::SubPanel> > bellows;
             std::shared_ptr<ftk::PushButton> resetButton;
         };
 
@@ -50,17 +50,17 @@ namespace djv
             auto layout = ftk::VerticalLayout::create(context);
             layout->setSpacingRole(ftk::SizeRole::Border);
 #if defined(TLRENDER_OCIO)
-            p.bellows["OCIO"] = ftk::Bellows::create(context, "OCIO", layout);
+            p.bellows["OCIO"] = djv::ui::SubPanel::create(context, "OCIO", layout);
             p.bellows["OCIO"]->setWidget(ocioWidget);
             p.bellows["OCIO"]->setToolWidget(ocioWidget->getEnabledCheckBox());
-            p.bellows["LUT"] = ftk::Bellows::create(context, "LUT", layout);
+            p.bellows["LUT"] = djv::ui::SubPanel::create(context, "LUT", layout);
             p.bellows["LUT"]->setWidget(lutWidget);
             p.bellows["LUT"]->setToolWidget(lutWidget->getEnabledCheckBox());
 #endif // TLRENDER_OCIO
-            p.bellows["Color"] = ftk::Bellows::create(context, "Color", layout);
+            p.bellows["Color"] = djv::ui::SubPanel::create(context, "Color", layout);
             p.bellows["Color"]->setWidget(colorWidget);
             p.bellows["Color"]->setToolWidget(colorWidget->getEnabledCheckBox());
-            p.bellows["Levels"] = ftk::Bellows::create(context, "Levels", layout);
+            p.bellows["Levels"] = djv::ui::SubPanel::create(context, "Levels", layout);
             p.bellows["Levels"]->setWidget(levelsWidget);
             p.bellows["Levels"]->setToolWidget(levelsWidget->getEnabledCheckBox());
             // The sections' labels share one width, so they line up as one

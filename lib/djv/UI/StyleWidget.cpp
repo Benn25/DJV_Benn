@@ -7,7 +7,7 @@
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/ColorSwatch.h>
-#include <ftk/UI/FloatEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/FormLayout.h>
 #include <ftk/UI/IWindow.h>
 #include <ftk/UI/PushButton.h>
@@ -27,8 +27,8 @@ namespace djv
             float autoDisplayScale = 0.F;
 
             std::shared_ptr<ftk::ComboBox> colorStyleComboBox;
-            std::shared_ptr<ftk::FloatEditSlider> brightnessSlider;
-            std::shared_ptr<ftk::FloatEditSlider> contrastSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> brightnessSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> contrastSlider;
             std::shared_ptr<ftk::ComboBox> displayScaleComboBox;
             std::shared_ptr<ftk::CheckBox> tooltipsCheckBox;
             std::shared_ptr<ftk::FormLayout> layout;
@@ -50,11 +50,11 @@ namespace djv
             p.colorStyleComboBox = ftk::ComboBox::create(context, ftk::getColorStyleLabels());
             p.colorStyleComboBox->setHStretch(ftk::Stretch::Expanding);
 
-            p.brightnessSlider = ftk::FloatEditSlider::create(context);
+            p.brightnessSlider = djv::ui::FloatValueSlider::create(context);
             p.brightnessSlider->setRange(.5F, 1.5F);
             p.brightnessSlider->setDefault(1.F);
 
-            p.contrastSlider = ftk::FloatEditSlider::create(context);
+            p.contrastSlider = djv::ui::FloatValueSlider::create(context);
             p.contrastSlider->setRange(.5F, 1.5F);
             p.contrastSlider->setDefault(1.F);
 

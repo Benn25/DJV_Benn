@@ -9,7 +9,7 @@
 #include <ftk/UI/Label.h>
 #include <ftk/UI/ToolButton.h>
 #include <ftk/UI/RowLayout.h>
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/Settings.h>
 #include <ftk/Core/Format.h>
 
@@ -87,7 +87,7 @@ namespace djv
             std::string name;
             // Weak, because each bellows holds the callback that reads this
             // map: a shared pointer here would be a cycle.
-            std::map<std::string, std::weak_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::weak_ptr<djv::ui::SubPanel> > bellows;
             
             std::shared_ptr<ftk::Icon> collapseIcon;
             std::shared_ptr<ftk::Icon> icon;
@@ -417,7 +417,7 @@ namespace djv
             _p->reorderPending = false;
         }
 
-        void IToolWidget::_loadSettings(const std::map<std::string, std::shared_ptr<ftk::Bellows> >& value)
+        void IToolWidget::_loadSettings(const std::map<std::string, std::shared_ptr<djv::ui::SubPanel> >& value)
         {
             FTK_P();
             nlohmann::json json;
@@ -459,7 +459,7 @@ namespace djv
             p.settings->set(ftk::Format("/{0}/Bellows").arg(p.name), json);
         }
 
-        void IToolWidget::_saveSettings(const std::map<std::string, std::shared_ptr<ftk::Bellows> >& value)
+        void IToolWidget::_saveSettings(const std::map<std::string, std::shared_ptr<djv::ui::SubPanel> >& value)
         {
             FTK_P();
             nlohmann::json json;

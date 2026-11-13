@@ -13,12 +13,12 @@
 
 #include <tlRender/Timeline/Util.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/ButtonGroup.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/Divider.h>
-#include <ftk/UI/FloatEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/FormLayout.h>
 #include <ftk/UI/ItemButtonList.h>
 #include <ftk/UI/IntEdit.h>
@@ -85,15 +85,15 @@ namespace djv
             std::shared_ptr<ftk::ButtonGroup> bButtonGroup;
             std::vector<FileWidget> widgets;
             std::shared_ptr<ftk::ComboBox> compareComboBox;
-            std::shared_ptr<ftk::FloatEditSlider> wipeXSlider;
-            std::shared_ptr<ftk::FloatEditSlider> wipeYSlider;
-            std::shared_ptr<ftk::FloatEditSlider> wipeRotationSlider;
-            std::shared_ptr<ftk::FloatEditSlider> overlaySlider;
-            std::shared_ptr<ftk::FloatEditSlider> differenceGainSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> wipeXSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> wipeYSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> wipeRotationSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> overlaySlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> differenceGainSlider;
             std::shared_ptr<ftk::ComboBox> compareTimeComboBox;
             std::shared_ptr<ftk::CheckBox> sameSizeCheckBox;
             std::shared_ptr<ftk::FormLayout> compareLayout;
-            std::map<std::string, std::shared_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::shared_ptr<djv::ui::SubPanel> > bellows;
             std::shared_ptr<ftk::ItemButtonList> fileList;
 
             // Where a dragged file would land: an index into the rows,
@@ -145,21 +145,21 @@ namespace djv
             p.compareComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.compareComboBox, "Files.CompareMode");
 
-            p.wipeXSlider = ftk::FloatEditSlider::create(context);
+            p.wipeXSlider = djv::ui::FloatValueSlider::create(context);
             p.wipeXSlider->setDefault(.5F);
             ftk::setScreenshotTag(p.wipeXSlider, "Files.CompareOptions");
-            p.wipeYSlider = ftk::FloatEditSlider::create(context);
+            p.wipeYSlider = djv::ui::FloatValueSlider::create(context);
             p.wipeYSlider->setDefault(.5F);
-            p.wipeRotationSlider = ftk::FloatEditSlider::create(context);
+            p.wipeRotationSlider = djv::ui::FloatValueSlider::create(context);
             p.wipeRotationSlider->setRange(0.F, 360.F);
             p.wipeRotationSlider->setStep(1.F);
             p.wipeRotationSlider->setLargeStep(10.F);
             p.wipeRotationSlider->setDefault(0.F);
 
-            p.overlaySlider = ftk::FloatEditSlider::create(context);
+            p.overlaySlider = djv::ui::FloatValueSlider::create(context);
             p.overlaySlider->setDefault(.5F);
 
-            p.differenceGainSlider = ftk::FloatEditSlider::create(context);
+            p.differenceGainSlider = djv::ui::FloatValueSlider::create(context);
             p.differenceGainSlider->setRange(1.F, 32.F);
             p.differenceGainSlider->setStep(1.F);
             p.differenceGainSlider->setLargeStep(4.F);
@@ -210,7 +210,7 @@ namespace djv
             p.compareLayout->addRow("Gain:", p.differenceGainSlider);
             p.compareLayout->addRow("Sync by:", p.compareTimeComboBox);
             p.compareLayout->addRow("Same size:", p.sameSizeCheckBox);
-            p.bellows["Compare"] = ftk::Bellows::create(context, "Compare", layout);
+            p.bellows["Compare"] = djv::ui::SubPanel::create(context, "Compare", layout);
             p.bellows["Compare"]->setWidget(vLayout);
 
             _setWidget(layout);

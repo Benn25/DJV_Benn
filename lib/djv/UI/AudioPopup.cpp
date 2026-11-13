@@ -5,7 +5,7 @@
 
 #include <djv/Models/AudioModel.h>
 
-#include <ftk/UI/IntEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/RowLayout.h>
 #include <ftk/UI/ToolButton.h>
 
@@ -16,7 +16,7 @@ namespace djv
         struct AudioPopup::Private
         {
             std::shared_ptr<ftk::ToolButton> muteButton;
-            std::shared_ptr<ftk::IntEditSlider> volumeSlider;
+            std::shared_ptr<djv::ui::IntValueSlider> volumeSlider;
 
             std::shared_ptr<ftk::Observer<bool> > muteObserver;
             std::shared_ptr<ftk::Observer<float> > volumeObserver;
@@ -38,7 +38,8 @@ namespace djv
             p.muteButton->setCheckable(true);
             p.muteButton->setTooltip("Mute the audio");
 
-            p.volumeSlider = ftk::IntEditSlider::create(context);
+            p.volumeSlider = djv::ui::IntValueSlider::create(context);
+            p.volumeSlider->setDefault(100);
             p.volumeSlider->setRange(0, 100);
             p.volumeSlider->setStep(1);
             p.volumeSlider->setLargeStep(10);

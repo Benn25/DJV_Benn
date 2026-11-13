@@ -9,7 +9,7 @@
 #include <tlRender/IO/USD.h>
 #endif // TLRENDER_USD
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ColorSwatch.h>
 #include <ftk/UI/ComboBox.h>
@@ -19,10 +19,9 @@
 #include <ftk/UI/FileBrowser.h>
 #include <ftk/UI/FileEdit.h>
 #include <ftk/UI/FloatEdit.h>
-#include <ftk/UI/FloatEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/FormLayout.h>
 #include <ftk/UI/IntEdit.h>
-#include <ftk/UI/IntEditSlider.h>
 #include <ftk/UI/Label.h>
 #include <ftk/UI/LineEdit.h>
 #include <ftk/UI/PushButton.h>
@@ -517,7 +516,7 @@ namespace djv
             std::shared_ptr<ftk::DoubleEdit> defaultSpeedEdit;
             std::shared_ptr<ftk::ComboBox> missingFramesComboBox;
             std::shared_ptr<ftk::CheckBox> missingIndicatorCheckBox;
-            std::shared_ptr<ftk::IntEditSlider> missingIndicatorWidthEdit;
+            std::shared_ptr<djv::ui::IntValueSlider> missingIndicatorWidthEdit;
             std::shared_ptr<ftk::ColorSwatch> missingIndicatorColorSwatch;
             std::shared_ptr<ftk::IntEdit> threadsEdit;
             std::shared_ptr<ftk::CheckBox> autoReloadCheckBox;
@@ -602,7 +601,8 @@ namespace djv
             ftk::setScreenshotTag(
                 p.missingIndicatorCheckBox, "Settings.MissingIndicator.Enabled");
 
-            p.missingIndicatorWidthEdit = ftk::IntEditSlider::create(context);
+            p.missingIndicatorWidthEdit = djv::ui::IntValueSlider::create(context);
+            p.missingIndicatorWidthEdit->setDefault(static_cast<int>(tl::ForegroundOptions().missingIndicator.width));
             p.missingIndicatorWidthEdit->setRange(1, 40);
             ftk::setScreenshotTag(
                 p.missingIndicatorWidthEdit, "Settings.MissingIndicator.LineWidth");
@@ -1400,7 +1400,7 @@ namespace djv
             std::shared_ptr<models::SettingsModel> settings;
 
             std::shared_ptr<ftk::IntEdit> renderWidthEdit;
-            std::shared_ptr<ftk::FloatEditSlider> complexitySlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> complexitySlider;
             std::shared_ptr<ftk::ComboBox> drawModeComboBox;
             std::shared_ptr<ftk::CheckBox> lightingCheckBox;
             std::shared_ptr<ftk::CheckBox> sRGBCheckBox;
@@ -1424,7 +1424,8 @@ namespace djv
             p.renderWidthEdit = ftk::IntEdit::create(context);
             p.renderWidthEdit->setRange(1, 8192);
 
-            p.complexitySlider = ftk::FloatEditSlider::create(context);
+            p.complexitySlider = djv::ui::FloatValueSlider::create(context);
+            p.complexitySlider->setDefault(tl::usd::Options().complexity);
 
             p.drawModeComboBox = ftk::ComboBox::create(context, tl::usd::getDrawModeLabels());
             p.drawModeComboBox->setHStretch(ftk::Stretch::Expanding);

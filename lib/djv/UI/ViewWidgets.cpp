@@ -5,19 +5,18 @@
 
 #include <djv/Models/ViewportModel.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/ButtonGroup.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ColorSwatch.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/DoubleEdit.h>
 #include <ftk/UI/FloatEdit.h>
-#include <ftk/UI/FloatEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/FormLayout.h>
 #include <ftk/UI/GridLayout.h>
 #include <ftk/UI/GroupBox.h>
 #include <ftk/UI/IntEdit.h>
-#include <ftk/UI/IntEditSlider.h>
 #include <ftk/UI/Label.h>
 #include <ftk/UI/LineEdit.h>
 #include <ftk/UI/LineEditModel.h>
@@ -519,7 +518,7 @@ namespace djv
             std::shared_ptr<ftk::ComboBox> typeComboBox;
             std::shared_ptr<ftk::ColorSwatch> solidSwatch;
             std::pair< std::shared_ptr<ftk::ColorSwatch>, std::shared_ptr<ftk::ColorSwatch> > checkersSwatch;
-            std::shared_ptr<ftk::IntEditSlider> checkersSizeSlider;
+            std::shared_ptr<djv::ui::IntValueSlider> checkersSizeSlider;
             std::pair< std::shared_ptr<ftk::ColorSwatch>, std::shared_ptr<ftk::ColorSwatch> > gradientSwatch;
             std::shared_ptr<ftk::FormLayout> layout;
 
@@ -549,7 +548,8 @@ namespace djv
             p.checkersSwatch.first->setEditable(true);
             p.checkersSwatch.second = ftk::ColorSwatch::create(context);
             p.checkersSwatch.second->setEditable(true);
-            p.checkersSizeSlider = ftk::IntEditSlider::create(context);
+            p.checkersSizeSlider = djv::ui::IntValueSlider::create(context);
+            p.checkersSizeSlider->setDefault(static_cast<int>(tl::BackgroundOptions().checkersSize.w));
             p.checkersSizeSlider->setRange(10, 100);
 
             p.gradientSwatch.first = ftk::ColorSwatch::create(context);
@@ -673,7 +673,7 @@ namespace djv
         struct ViewOutlineWidget::Private
         {
             std::shared_ptr<ftk::CheckBox> enabledCheckBox;
-            std::shared_ptr<ftk::IntEditSlider> lineWidthSlider;
+            std::shared_ptr<djv::ui::IntValueSlider> lineWidthSlider;
             std::shared_ptr<ftk::ColorSwatch> colorSwatch;
             std::shared_ptr<ftk::FormLayout> layout;
 
@@ -692,7 +692,8 @@ namespace djv
             p.enabledCheckBox->setTooltip("Toggle whether the outline is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.Outline.Enabled");
 
-            p.lineWidthSlider = ftk::IntEditSlider::create(context);
+            p.lineWidthSlider = djv::ui::IntValueSlider::create(context);
+            p.lineWidthSlider->setDefault(static_cast<int>(tl::BackgroundOptions().outline.width));
             p.lineWidthSlider->setRange(1, 100);
             ftk::setScreenshotTag(p.lineWidthSlider, "View.Outline.LineWidth");
 
@@ -769,11 +770,11 @@ namespace djv
         {
             std::shared_ptr<ftk::CheckBox> enabledCheckBox;
             std::shared_ptr<ftk::ComboBox> cellModeComboBox;
-            std::shared_ptr<ftk::IntEditSlider> cellSizeSlider;
+            std::shared_ptr<djv::ui::IntValueSlider> cellSizeSlider;
             std::shared_ptr<ftk::IntEdit> cellCountXEdit;
             std::shared_ptr<ftk::IntEdit> cellCountYEdit;
             std::shared_ptr<ftk::HorizontalLayout> cellCountLayout;
-            std::shared_ptr<ftk::IntEditSlider> lineWidthEdit;
+            std::shared_ptr<djv::ui::IntValueSlider> lineWidthEdit;
             std::shared_ptr<ftk::ColorSwatch> colorSwatch;
             std::shared_ptr<ftk::ComboBox> labelsComboBox;
             std::shared_ptr<ftk::ColorSwatch> textColorSwatch;
@@ -798,7 +799,8 @@ namespace djv
             p.cellModeComboBox = ftk::ComboBox::create(context, tl::getGridCellModeLabels());
             ftk::setScreenshotTag(p.cellModeComboBox, "View.Grid.CellMode");
 
-            p.cellSizeSlider = ftk::IntEditSlider::create(context);
+            p.cellSizeSlider = djv::ui::IntValueSlider::create(context);
+            p.cellSizeSlider->setDefault(static_cast<int>(tl::ForegroundOptions().grid.cellSize));
             p.cellSizeSlider->setRange(1, 1000);
             ftk::setScreenshotTag(p.cellSizeSlider, "View.Grid.CellSize");
 
@@ -808,7 +810,8 @@ namespace djv
             p.cellCountYEdit = ftk::IntEdit::create(context);
             p.cellCountYEdit->setRange(1, 100);
 
-            p.lineWidthEdit = ftk::IntEditSlider::create(context);
+            p.lineWidthEdit = djv::ui::IntValueSlider::create(context);
+            p.lineWidthEdit->setDefault(static_cast<int>(tl::ForegroundOptions().grid.lineWidth));
             p.lineWidthEdit->setRange(1, 10);
 
             p.colorSwatch = ftk::ColorSwatch::create(context);
@@ -970,8 +973,8 @@ namespace djv
         struct ViewCenterMarkerWidget::Private
         {
             std::shared_ptr<ftk::CheckBox> enabledCheckBox;
-            std::shared_ptr<ftk::IntEditSlider> sizeEdit;
-            std::shared_ptr<ftk::IntEditSlider> lineWidthEdit;
+            std::shared_ptr<djv::ui::IntValueSlider> sizeEdit;
+            std::shared_ptr<djv::ui::IntValueSlider> lineWidthEdit;
             std::shared_ptr<ftk::ColorSwatch> colorSwatch;
             std::shared_ptr<ftk::FormLayout> layout;
 
@@ -990,11 +993,13 @@ namespace djv
             p.enabledCheckBox->setTooltip("Toggle whether the center marker is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.CenterMarker.Enabled");
 
-            p.sizeEdit = ftk::IntEditSlider::create(context);
+            p.sizeEdit = djv::ui::IntValueSlider::create(context);
+            p.sizeEdit->setDefault(static_cast<int>(tl::ForegroundOptions().centerMarker.size));
             p.sizeEdit->setRange(10, 100);
             ftk::setScreenshotTag(p.sizeEdit, "View.CenterMarker.Size");
 
-            p.lineWidthEdit = ftk::IntEditSlider::create(context);
+            p.lineWidthEdit = djv::ui::IntValueSlider::create(context);
+            p.lineWidthEdit->setDefault(static_cast<int>(tl::ForegroundOptions().centerMarker.width));
             p.lineWidthEdit->setRange(1, 10);
             ftk::setScreenshotTag(p.lineWidthEdit, "View.CenterMarker.LineWidth");
 
@@ -1081,7 +1086,7 @@ namespace djv
         {
             std::shared_ptr<ftk::CheckBox> enabledCheckBox;
             std::shared_ptr<ftk::ComboBox> modeComboBox;
-            std::map<std::string, std::shared_ptr<ftk::FloatEditSlider> > sliders;
+            std::map<std::string, std::shared_ptr<djv::ui::FloatValueSlider> > sliders;
             std::shared_ptr<ftk::FormLayout> layout;
 
             std::shared_ptr<ftk::Observer<tl::ForegroundOptions> > optionsObservers;
@@ -1108,12 +1113,12 @@ namespace djv
                 "Luminance compares the brightness of the pixel.");
             ftk::setScreenshotTag(p.modeComboBox, "View.ClippingWarning.Mode");
 
-            p.sliders["Low"] = ftk::FloatEditSlider::create(context);
+            p.sliders["Low"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["Low"]->setDefault(0.F);
             p.sliders["Low"]->getModel()->setRangeSoft(true);
             p.sliders["Low"]->setTooltip("Pixels below this are covered in magenta.");
             ftk::setScreenshotTag(p.sliders["Low"], "View.ClippingWarning.Low");
-            p.sliders["High"] = ftk::FloatEditSlider::create(context);
+            p.sliders["High"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["High"]->setDefault(1.F);
             p.sliders["High"]->getModel()->setRangeSoft(true);
             p.sliders["High"]->setTooltip("Pixels above this are covered in red.");

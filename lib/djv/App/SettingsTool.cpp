@@ -22,7 +22,7 @@ namespace djv
         {
             std::shared_ptr<ftk::PushButton> saveButton;
             std::shared_ptr<ftk::PushButton> resetButton;
-            std::map<std::string, std::shared_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::shared_ptr<djv::ui::SubPanel> > bellows;
             std::shared_ptr<ftk::VerticalLayout> layout;
             std::shared_ptr<ftk::ScrollWidget> scrollWidget;
         };
@@ -47,26 +47,26 @@ namespace djv
             auto vLayout = ftk::VerticalLayout::create(context);
             vLayout->setSpacingRole(ftk::SizeRole::Border);
 
-            p.bellows["Cache"] = ftk::Bellows::create(context, "Cache", vLayout);
+            p.bellows["Cache"] = djv::ui::SubPanel::create(context, "Cache", vLayout);
             auto vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::CacheSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["Cache"]->setWidget(vLayout2);
 
-            p.bellows["FileBrowser"] = ftk::Bellows::create(context, "File Browser", vLayout);
+            p.bellows["FileBrowser"] = djv::ui::SubPanel::create(context, "File Browser", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::FileBrowserSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["FileBrowser"]->setWidget(vLayout2);
 
-            p.bellows["ImageSeqs"] = ftk::Bellows::create(context, "Image Sequences", vLayout);
+            p.bellows["ImageSeqs"] = djv::ui::SubPanel::create(context, "Image Sequences", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::ImageSeqSettingsWidget::create(
                 context, settingsModel, app->getViewportModel(), vLayout2);
             p.bellows["ImageSeqs"]->setWidget(vLayout2);
 
-            p.bellows["OTIO"] = ftk::Bellows::create(context, "OTIO", vLayout);
+            p.bellows["OTIO"] = djv::ui::SubPanel::create(context, "OTIO", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ftk::Label::create(
@@ -76,19 +76,19 @@ namespace djv
             ui::OTIOSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["OTIO"]->setWidget(vLayout2);
 
-            p.bellows["Mouse"] = ftk::Bellows::create(context, "Mouse", vLayout);
+            p.bellows["Mouse"] = djv::ui::SubPanel::create(context, "Mouse", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::MouseSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["Mouse"]->setWidget(vLayout2);
 
-            p.bellows["Playback"] = ftk::Bellows::create(context, "Playback", vLayout);
+            p.bellows["Playback"] = djv::ui::SubPanel::create(context, "Playback", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::PlaybackSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["Playback"]->setWidget(vLayout2);
 
-            p.bellows["Audio"] = ftk::Bellows::create(context, "Audio", vLayout);
+            p.bellows["Audio"] = djv::ui::SubPanel::create(context, "Audio", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ftk::Label::create(
@@ -98,26 +98,26 @@ namespace djv
             ui::AudioSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["Audio"]->setWidget(vLayout2);
 
-            p.bellows["Shortcuts"] = ftk::Bellows::create(context, "Keyboard Shortcuts", vLayout);
+            p.bellows["Shortcuts"] = djv::ui::SubPanel::create(context, "Keyboard Shortcuts", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::ShortcutsSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["Shortcuts"]->setWidget(vLayout2);
 
-            p.bellows["Style"] = ftk::Bellows::create(context, "Style", vLayout);
+            p.bellows["Style"] = djv::ui::SubPanel::create(context, "Style", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::StyleSettingsWidget::create(context, settingsModel, vLayout2);
             p.bellows["Style"]->setWidget(vLayout2);
 
-            p.bellows["Time"] = ftk::Bellows::create(context, "Time", vLayout);
+            p.bellows["Time"] = djv::ui::SubPanel::create(context, "Time", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ui::TimeSettingsWidget::create(context, app->getTimeUnitsModel(), vLayout2);
             p.bellows["Time"]->setWidget(vLayout2);
 
 #if defined(TLRENDER_FFMPEG_PLUGIN)
-            p.bellows["FFmpeg"] = ftk::Bellows::create(context, "FFmpeg", vLayout);
+            p.bellows["FFmpeg"] = djv::ui::SubPanel::create(context, "FFmpeg", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ftk::Label::create(
@@ -129,7 +129,7 @@ namespace djv
 #endif // TLRENDER_FFMPEG_PLUGIN
 
 #if defined(TLRENDER_USD)
-            p.bellows["USD"] = ftk::Bellows::create(context, "USD", vLayout);
+            p.bellows["USD"] = djv::ui::SubPanel::create(context, "USD", vLayout);
             vLayout2 = ftk::VerticalLayout::create(context, vLayout);
             vLayout2->setMarginRole(ftk::SizeRole::Margin);
             ftk::Label::create(

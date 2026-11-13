@@ -27,7 +27,7 @@ namespace djv
             std::shared_ptr<ui::ViewCenterMarkerWidget> centerMarkerWidget;
             std::shared_ptr<ui::ViewClippingWarningWidget> clippingWarningWidget;
             std::shared_ptr<ui::ViewHUDWidget> hudWidget;
-            std::map<std::string, std::shared_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::shared_ptr<djv::ui::SubPanel> > bellows;
 
         };
 
@@ -59,25 +59,25 @@ namespace djv
 
             auto layout = ftk::VerticalLayout::create(context);
             layout->setSpacingRole(ftk::SizeRole::Border);
-            p.bellows["Options"] = ftk::Bellows::create(context, "Options", layout);
+            p.bellows["Options"] = djv::ui::SubPanel::create(context, "Options", layout);
             p.bellows["Options"]->setWidget(p.optionsWidget);
-            p.bellows["AspectRatio"] = ftk::Bellows::create(context, "Aspect Ratio", layout);
+            p.bellows["AspectRatio"] = djv::ui::SubPanel::create(context, "Aspect Ratio", layout);
             p.bellows["AspectRatio"]->setWidget(p.aspectRatioWidget);
-            p.bellows["Background"] = ftk::Bellows::create(context, "Background", layout);
+            p.bellows["Background"] = djv::ui::SubPanel::create(context, "Background", layout);
             p.bellows["Background"]->setWidget(p.backgroundWidget);
-            p.bellows["Outline"] = ftk::Bellows::create(context, "Outline", layout);
+            p.bellows["Outline"] = djv::ui::SubPanel::create(context, "Outline", layout);
             p.bellows["Outline"]->setWidget(p.outlineWidget);
             p.bellows["Outline"]->setToolWidget(p.outlineWidget->getEnabledCheckBox());
-            p.bellows["Grid"] = ftk::Bellows::create(context, "Grid", layout);
+            p.bellows["Grid"] = djv::ui::SubPanel::create(context, "Grid", layout);
             p.bellows["Grid"]->setWidget(p.gridWidget);
             p.bellows["Grid"]->setToolWidget(p.gridWidget->getEnabledCheckBox());
-            p.bellows["CenterMarker"] = ftk::Bellows::create(context, "Center Marker", layout);
+            p.bellows["CenterMarker"] = djv::ui::SubPanel::create(context, "Center Marker", layout);
             p.bellows["CenterMarker"]->setWidget(p.centerMarkerWidget);
             p.bellows["CenterMarker"]->setToolWidget(p.centerMarkerWidget->getEnabledCheckBox());
-            p.bellows["ClippingWarning"] = ftk::Bellows::create(context, "Clipping Warning", layout);
+            p.bellows["ClippingWarning"] = djv::ui::SubPanel::create(context, "Clipping Warning", layout);
             p.bellows["ClippingWarning"]->setWidget(p.clippingWarningWidget);
             p.bellows["ClippingWarning"]->setToolWidget(p.clippingWarningWidget->getEnabledCheckBox());
-            p.bellows["HUD"] = ftk::Bellows::create(context, "HUD", layout);
+            p.bellows["HUD"] = djv::ui::SubPanel::create(context, "HUD", layout);
             p.bellows["HUD"]->setWidget(p.hudWidget);
             p.bellows["HUD"]->setToolWidget(p.hudWidget->getEnabledCheckBox());
             // The sections' labels share one width, so they line up as one

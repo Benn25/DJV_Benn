@@ -22,6 +22,8 @@ set(HEADERS
     PixelLoupe.h
     PixelProbe.h
     ScopesWidget.h
+    SubPanel.h
+    ValueSlider.h
     ThumbnailColor.h
     ViewWidgets.h
     Viewport.h
@@ -56,6 +58,8 @@ set(SOURCE
     PixelProbe.cpp
     RemoteSession.cpp
     ScopesWidget.cpp
+    SubPanel.cpp
+    ValueSlider.cpp
     ThumbnailColor.cpp
     ViewWidgets.cpp
     Viewport.cpp

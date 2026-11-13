@@ -10,15 +10,14 @@
 
 #include <tlRender/Timeline/Util.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/ButtonGroup.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/FileEdit.h>
 #include <ftk/UI/FloatEdit.h>
-#include <ftk/UI/FloatEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/FormLayout.h>
-#include <ftk/UI/IntEditSlider.h>
 #include <ftk/UI/Label.h>
 #include <ftk/UI/ToolButton.h>
 #include <ftk/UI/RowLayout.h>
@@ -679,10 +678,10 @@ namespace djv
         struct ColorWidget::Private
         {
             std::shared_ptr<ftk::CheckBox> enabledCheckBox;
-            std::map<std::string, std::shared_ptr<ftk::FloatEditSlider> > sliders;
-            std::shared_ptr<ftk::IntEditSlider> hueSlider;
-            std::shared_ptr<ftk::FloatEditSlider> exposureSlider;
-            std::shared_ptr<ftk::FloatEditSlider> softClipSlider;
+            std::map<std::string, std::shared_ptr<djv::ui::FloatValueSlider> > sliders;
+            std::shared_ptr<djv::ui::IntValueSlider> hueSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> exposureSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> softClipSlider;
             std::shared_ptr<ftk::FormLayout> layout;
 
             std::shared_ptr<ftk::Observer<tl::DisplayOptions> > optionsObservers;
@@ -699,38 +698,38 @@ namespace djv
             p.enabledCheckBox = ftk::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the color controls, exposure, and soft clip are enabled.");
 
-            p.sliders["Add"] = ftk::FloatEditSlider::create(context);
+            p.sliders["Add"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["Add"]->setRange(-1.F, 1.F);
             p.sliders["Add"]->setDefault(0.F);
             p.sliders["Add"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["Add"], "Color.Controls.Add");
 
-            p.sliders["Brightness"] = ftk::FloatEditSlider::create(context);
+            p.sliders["Brightness"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["Brightness"]->setRange(0.F, 4.F);
             p.sliders["Brightness"]->setDefault(1.F);
             p.sliders["Brightness"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["Brightness"], "Color.Controls.Brightness");
 
-            p.sliders["Contrast"] = ftk::FloatEditSlider::create(context);
+            p.sliders["Contrast"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["Contrast"]->setRange(0.F, 4.F);
             p.sliders["Contrast"]->setDefault(1.F);
             p.sliders["Contrast"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["Contrast"], "Color.Controls.Contrast");
 
-            p.sliders["Saturation"] = ftk::FloatEditSlider::create(context);
+            p.sliders["Saturation"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["Saturation"]->setRange(0.F, 4.F);
             p.sliders["Saturation"]->setDefault(1.F);
             p.sliders["Saturation"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["Saturation"], "Color.Controls.Saturation");
 
-            p.hueSlider = ftk::IntEditSlider::create(context);
+            p.hueSlider = djv::ui::IntValueSlider::create(context);
             p.hueSlider->setRange(0, 360);
             p.hueSlider->setStep(10);
             p.hueSlider->setLargeStep(60);
             p.hueSlider->setDefault(0);
             ftk::setScreenshotTag(p.hueSlider, "Color.Controls.Hue");
 
-            p.exposureSlider = ftk::FloatEditSlider::create(context);
+            p.exposureSlider = djv::ui::FloatValueSlider::create(context);
             p.exposureSlider->setRange(-10.F, 10.F);
             p.exposureSlider->setDefault(0.F);
             p.exposureSlider->getModel()->setRangeSoft(true);
@@ -739,7 +738,7 @@ namespace djv
                 "brightness, and zero leaves the image unchanged.");
             ftk::setScreenshotTag(p.exposureSlider, "Color.Controls.Exposure");
 
-            p.softClipSlider = ftk::FloatEditSlider::create(context);
+            p.softClipSlider = djv::ui::FloatValueSlider::create(context);
             p.softClipSlider->setDefault(0.F);
             p.softClipSlider->setTooltip(
                 "Roll off values approaching white instead of clipping them.");
@@ -917,7 +916,7 @@ namespace djv
             std::shared_ptr<ftk::Settings> settings;
 
             std::shared_ptr<ftk::CheckBox> enabledCheckBox;
-            std::map<std::string, std::shared_ptr<ftk::FloatEditSlider> > sliders;
+            std::map<std::string, std::shared_ptr<djv::ui::FloatValueSlider> > sliders;
             std::shared_ptr<ftk::FormLayout> layout;
 
             std::shared_ptr<ftk::Observer<tl::DisplayOptions> > optionsObservers;
@@ -944,32 +943,32 @@ namespace djv
             // dedicated range edits used to.
             ftk::RangeF range(0.F, 1.F);
             p.settings->getT(models::settingsKeys::colorLevelsInRange, range);
-            p.sliders["InLow"] = ftk::FloatEditSlider::create(context);
+            p.sliders["InLow"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["InLow"]->setRange(range);
             p.sliders["InLow"]->setDefault(0.F);
             p.sliders["InLow"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["InLow"], "Color.Levels.In");
 
-            p.sliders["InHigh"] = ftk::FloatEditSlider::create(context);
+            p.sliders["InHigh"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["InHigh"]->setRange(range);
             p.sliders["InHigh"]->setDefault(1.F);
             p.sliders["InHigh"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["InHigh"], "Color.Levels.In");
 
-            p.sliders["Gamma"] = ftk::FloatEditSlider::create(context);
+            p.sliders["Gamma"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["Gamma"]->setRange(.1F, 4.F);
             p.sliders["Gamma"]->setDefault(1.F);
             p.sliders["Gamma"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["Gamma"], "Color.Levels.Gamma");
 
             p.settings->getT(models::settingsKeys::colorLevelsOutRange, range);
-            p.sliders["OutLow"] = ftk::FloatEditSlider::create(context);
+            p.sliders["OutLow"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["OutLow"]->setRange(range);
             p.sliders["OutLow"]->setDefault(0.F);
             p.sliders["OutLow"]->getModel()->setRangeSoft(true);
             ftk::setScreenshotTag(p.sliders["OutLow"], "Color.Levels.Out");
 
-            p.sliders["OutHigh"] = ftk::FloatEditSlider::create(context);
+            p.sliders["OutHigh"] = djv::ui::FloatValueSlider::create(context);
             p.sliders["OutHigh"]->setRange(range);
             p.sliders["OutHigh"]->setDefault(1.F);
             p.sliders["OutHigh"]->getModel()->setRangeSoft(true);

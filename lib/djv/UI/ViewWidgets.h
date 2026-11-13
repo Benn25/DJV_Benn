@@ -8,6 +8,8 @@
 #include <djv/Models/Export.h>
 #include <djv/Models/ViewportModel.h>
 
+#include <ftk/UI/IContainer.h>
+
 #include <tlRender/UI/Viewport.h>
 #include <tlRender/Timeline/BackgroundOptions.h>
 #include <tlRender/Timeline/DisplayOptions.h>

@@ -14,12 +14,12 @@
 
 #include <tlRender/Timeline/Player.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 #include <ftk/UI/ColorDot.h>
 #include <ftk/UI/ColorSwatch.h>
 #include <ftk/UI/DialogSystem.h>
 #include <ftk/UI/Divider.h>
-#include <ftk/UI/FloatEditSlider.h>
+#include <djv/UI/ValueSlider.h>
 #include <ftk/UI/IWindow.h>
 #include <ftk/UI/ItemButton.h>
 #include <ftk/UI/ItemButtonList.h>
@@ -211,12 +211,12 @@ namespace djv
             std::shared_ptr<ftk::ColorSwatch> colorSwatch;
             std::shared_ptr<ftk::ToolButton> penButton;
             std::shared_ptr<ftk::ToolButton> eraserButton;
-            std::shared_ptr<ftk::FloatEditSlider> sizeSlider;
+            std::shared_ptr<djv::ui::FloatValueSlider> sizeSlider;
             std::shared_ptr<ftk::ToolButton> undoButton;
             std::shared_ptr<ftk::ToolButton> redoButton;
             std::shared_ptr<ftk::PushButton> clearDrawingButton;
 
-            std::map<std::string, std::shared_ptr<ftk::Bellows> > bellows;
+            std::map<std::string, std::shared_ptr<djv::ui::SubPanel> > bellows;
             std::shared_ptr<ftk::ScrollWidget> scrollWidget;
 
             //! The marker being edited in place, or empty.
@@ -359,7 +359,8 @@ namespace djv
             sizeLayout->setSpacingRole(ftk::SizeRole::SpacingSmall);
             auto sizeLabel = ftk::Label::create(context, "Size:", sizeLayout);
             sizeLabel->setVAlign(ftk::VAlign::Center);
-            p.sizeSlider = ftk::FloatEditSlider::create(context, sizeLayout);
+            p.sizeSlider = djv::ui::FloatValueSlider::create(context, sizeLayout);
+            p.sizeSlider->setDefault(4.F);
             p.sizeSlider->setRange(1.F, 50.F);
             p.sizeSlider->setValue(drawModel->getSize());
             p.sizeSlider->setTooltip("The stroke width, in source pixels.");
@@ -375,10 +376,10 @@ namespace djv
 
             auto layout = ftk::VerticalLayout::create(context);
             layout->setSpacingRole(ftk::SizeRole::Border);
-            p.bellows["Drawing"] = ftk::Bellows::create(context, "Drawing", layout);
+            p.bellows["Drawing"] = djv::ui::SubPanel::create(context, "Drawing", layout);
             p.bellows["Drawing"]->setWidget(drawingWidget);
             p.bellows["Drawing"]->setOpen(true);
-            p.bellows["Markers"] = ftk::Bellows::create(context, "Markers", layout);
+            p.bellows["Markers"] = djv::ui::SubPanel::create(context, "Markers", layout);
             p.bellows["Markers"]->setWidget(p.markerListLayout);
             p.bellows["Markers"]->setToolWidget(markerToolLayout);
             p.bellows["Markers"]->setOpen(true);

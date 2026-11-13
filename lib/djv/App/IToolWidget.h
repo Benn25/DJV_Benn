@@ -7,7 +7,7 @@
 #include <djv/Models/Export.h>
 #include <djv/Models/ToolsModel.h>
 
-#include <ftk/UI/Bellows.h>
+#include <djv/UI/SubPanel.h>
 
 #include <optional>
 
@@ -73,9 +73,9 @@ namespace djv
             DJV_APP_API void mouseReleaseEvent(ftk::MouseClickEvent&) override;
 
         protected:
-            void _loadSettings(const std::map<std::string, std::shared_ptr<ftk::Bellows> >&);
+            void _loadSettings(const std::map<std::string, std::shared_ptr<djv::ui::SubPanel> >&);
             void _bellowsSave();
-            void _saveSettings(const std::map<std::string, std::shared_ptr<ftk::Bellows> >&);
+            void _saveSettings(const std::map<std::string, std::shared_ptr<djv::ui::SubPanel> >&);
 
             DJV_APP_API void _setWidget(const std::shared_ptr<ftk::IWidget>&);
 

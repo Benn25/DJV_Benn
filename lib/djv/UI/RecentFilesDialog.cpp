@@ -3,6 +3,7 @@
 
 #include <djv/UI/RecentFilesDialog.h>
 
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/Divider.h>
@@ -74,7 +75,7 @@ namespace djv
                         "Forget the recent files, playlists, reviews and "
                         "directories.");
                     ftk::setScreenshotTag(_clearButton, "RecentFiles.Clear");
-                    _clearOnExitCheckBox = ftk::CheckBox::create(context, "Clear on exit");
+                    _clearOnExitCheckBox = djv::ui::CheckBox::create(context, "Clear on exit");
                     _clearOnExitCheckBox->setChecked(clearOnExit);
                     _clearOnExitCheckBox->setTooltip(
                         "Forget the recent files, playlists, reviews and "

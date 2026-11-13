@@ -12,6 +12,7 @@
 
 #include <djv/UI/SubPanel.h>
 #include <ftk/UI/ButtonGroup.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/FileEdit.h>
@@ -105,7 +106,7 @@ namespace djv
             p.colorModel = colorModel;
             p.ocioModel = models::OCIOModel::create(context);
 
-            p.jpgStandardCheckBox = ftk::CheckBox::create(context, "Standard view");
+            p.jpgStandardCheckBox = djv::ui::CheckBox::create(context, "Standard view");
             p.jpgStandardCheckBox->setTooltip(
                 "Show a JPG with the display's Standard view rather than the "
                 "one chosen, as Blender's image editor shows a picture: a JPG "
@@ -116,7 +117,7 @@ namespace djv
                 "in the Layers tool instead.");
             p.shownWithLabel = ftk::Label::create(context);
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether OCIO is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "Color.OCIO.Enabled");
 
@@ -569,7 +570,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::ui::LUTWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the LUT is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "Color.LUT.Enabled");
 
@@ -695,7 +696,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::ui::ColorWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the color controls, exposure, and soft clip are enabled.");
 
             p.sliders["Add"] = djv::ui::FloatValueSlider::create(context);
@@ -934,7 +935,7 @@ namespace djv
 
             p.settings = settings;
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether levels are enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "Color.Levels.Enabled");
 

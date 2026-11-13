@@ -13,6 +13,7 @@
 
 #include <tlRender/Timeline/Player.h>
 
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/FormLayout.h>
@@ -101,7 +102,7 @@ namespace djv
             p.pixelLabel->setFont(ftk::FontType::Mono);
             ftk::setScreenshotTag(p.pixelLabel, "Magnify.Pixel");
 
-            p.viewPosAndZoomCheckBox = ftk::CheckBox::create(context);
+            p.viewPosAndZoomCheckBox = djv::ui::CheckBox::create(context);
             p.viewPosAndZoomCheckBox->setHStretch(ftk::Stretch::Expanding);
             p.viewPosAndZoomCheckBox->setTooltip("Track the view position and zoom.");
             ftk::setScreenshotTag(p.viewPosAndZoomCheckBox, "Magnify.ViewPosAndZoom");

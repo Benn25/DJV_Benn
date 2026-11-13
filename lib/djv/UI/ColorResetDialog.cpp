@@ -3,6 +3,7 @@
 
 #include <djv/UI/ColorResetDialog.h>
 
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 
 #include <array>
@@ -38,10 +39,10 @@ namespace djv
 
                     // The same sections, in the same order, as the color
                     // tool.
-                    _checkBoxes.push_back(ftk::CheckBox::create(context, "OCIO"));
-                    _checkBoxes.push_back(ftk::CheckBox::create(context, "LUT"));
-                    _checkBoxes.push_back(ftk::CheckBox::create(context, "Color"));
-                    _checkBoxes.push_back(ftk::CheckBox::create(context, "Levels"));
+                    _checkBoxes.push_back(djv::ui::CheckBox::create(context, "OCIO"));
+                    _checkBoxes.push_back(djv::ui::CheckBox::create(context, "LUT"));
+                    _checkBoxes.push_back(djv::ui::CheckBox::create(context, "Color"));
+                    _checkBoxes.push_back(djv::ui::CheckBox::create(context, "Levels"));
                     _checkBoxes[0]->setTooltip(
                         "The configuration, the color spaces, and the extension assignments.");
                     _checkBoxes[2]->setTooltip(

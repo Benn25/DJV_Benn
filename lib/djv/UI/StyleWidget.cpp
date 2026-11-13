@@ -4,6 +4,7 @@
 #include <djv/UI/SettingsWidgets.h>
 
 #include <ftk/UI/App.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/ColorSwatch.h>
@@ -66,7 +67,7 @@ namespace djv
             // it looks; it was the last thing in a section called
             // "Miscellaneous", which is where a setting goes to hide
             // (DJV #899). The setting is stored where it always was.
-            p.tooltipsCheckBox = ftk::CheckBox::create(context);
+            p.tooltipsCheckBox = djv::ui::CheckBox::create(context);
             p.tooltipsCheckBox->setHStretch(ftk::Stretch::Expanding);
 
             p.layout = ftk::FormLayout::create(context);

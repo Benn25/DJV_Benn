@@ -7,6 +7,7 @@
 
 #include <djv/UI/SubPanel.h>
 #include <ftk/UI/ButtonGroup.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ColorSwatch.h>
 #include <ftk/UI/ComboBox.h>
@@ -68,11 +69,11 @@ namespace djv
             p.channelsComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.channelsComboBox, "View.Options.Channels");
 
-            p.negativeCheckBox = ftk::CheckBox::create(context);
+            p.negativeCheckBox = djv::ui::CheckBox::create(context);
             ftk::setScreenshotTag(p.negativeCheckBox, "View.Options.Negative");
 
-            p.mirrorXCheckBox = ftk::CheckBox::create(context, "Horizontal");
-            p.mirrorYCheckBox = ftk::CheckBox::create(context, "Vertical");
+            p.mirrorXCheckBox = djv::ui::CheckBox::create(context, "Horizontal");
+            p.mirrorYCheckBox = djv::ui::CheckBox::create(context, "Vertical");
             auto mirrorLayout = ftk::HorizontalLayout::create(context);
             mirrorLayout->setSpacingRole(ftk::SizeRole::SpacingSmall);
             p.mirrorXCheckBox->setParent(mirrorLayout);
@@ -688,7 +689,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewOutlineWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the outline is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.Outline.Enabled");
 
@@ -792,7 +793,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewGridWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the grid is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.Grid.Enabled");
 
@@ -989,7 +990,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewCenterMarkerWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the center marker is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.CenterMarker.Enabled");
 
@@ -1100,7 +1101,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewClippingWarningWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the clipping warning is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.ClippingWarning.Enabled");
 
@@ -1230,7 +1231,7 @@ namespace djv
             ftk::IContainer::_init(context, "djv::app::ViewHUDWidget", parent);
             FTK_P();
 
-            p.enabledCheckBox = ftk::CheckBox::create(context);
+            p.enabledCheckBox = djv::ui::CheckBox::create(context);
             p.enabledCheckBox->setTooltip("Toggle whether the HUD is enabled.");
             ftk::setScreenshotTag(p.enabledCheckBox, "View.HUD.Enabled");
 

@@ -25,14 +25,15 @@ namespace djv
             }
 
             //! The header: the arrow, smaller than a panel's, and the title,
-            //! a little dimmer, on a bar lower than a panel's. Clicked
-            //! anywhere, it opens and closes.
+            //! a little dimmer, on a bar lower than a panel's. It only
+            //! draws: the subpanel takes the press, to sweep its siblings.
             class Header : public ftk::IButton
             {
             protected:
                 void _init(const std::shared_ptr<ftk::Context>& context)
                 {
                     IButton::_init(context, "djv::ui::SubPanel::Header", nullptr);
+                    _setMousePressEnabled(false);
                     setCheckable(true);
                     setIcon("BellowsClosed");
                     setCheckedIcon("BellowsOpen");
@@ -124,6 +125,9 @@ namespace djv
 
             int inset = 0;
             int radius = 0;
+
+            bool sweep = false;
+            bool sweepOpen = false;
         };
 
         void SubPanel::_init(
@@ -142,12 +146,6 @@ namespace djv
             p.layout = ftk::VerticalLayout::create(context, shared_from_this());
             p.layout->setSpacingRole(ftk::SizeRole::None);
             p.headerLayout->setParent(p.layout);
-
-            p.header->setCheckedCallback(
-                [this](bool value)
-                {
-                    setOpen(value);
-                });
         }
 
         SubPanel::SubPanel() :
@@ -280,6 +278,58 @@ namespace djv
             FTK_P();
             p.inset = event.style->getSizeRole(ftk::SizeRole::MarginSmall, event.displayScale);
             p.radius = event.style->getSizeRole(ftk::SizeRole::MarginInside, event.displayScale) * 2;
+        }
+
+        void SubPanel::mouseMoveEvent(ftk::MouseMoveEvent& event)
+        {
+            IWidget::mouseMoveEvent(event);
+            FTK_P();
+            if (!p.sweep)
+                return;
+            event.accept = true;
+            // The others of the same panel only, not those of a panel inside
+            // one of them or of another panel.
+            if (auto parent = getParent())
+            {
+                for (const auto& child : parent->getChildren())
+                {
+                    auto other = std::dynamic_pointer_cast<SubPanel>(child);
+                    if (other &&
+                        other.get() != this &&
+                        other->isVisible(false) &&
+                        other->isOpen() != p.sweepOpen &&
+                        ftk::contains(other->_p->header->getGeometry(), event.pos))
+                    {
+                        other->setOpen(p.sweepOpen);
+                    }
+                }
+            }
+        }
+
+        void SubPanel::mousePressEvent(ftk::MouseClickEvent& event)
+        {
+            IWidget::mousePressEvent(event);
+            FTK_P();
+            if (ftk::MouseButton::Left == event.button &&
+                !event.accept &&
+                ftk::contains(p.header->getGeometry(), event.pos))
+            {
+                event.accept = true;
+                setOpen(!isOpen());
+                p.sweep = true;
+                p.sweepOpen = isOpen();
+            }
+        }
+
+        void SubPanel::mouseReleaseEvent(ftk::MouseClickEvent& event)
+        {
+            IWidget::mouseReleaseEvent(event);
+            FTK_P();
+            if (p.sweep)
+            {
+                event.accept = true;
+                p.sweep = false;
+            }
         }
 
         void SubPanel::drawEvent(const ftk::Box2I& drawRect, const ftk::DrawEvent& event)

@@ -10,6 +10,7 @@
 #endif // TLRENDER_USD
 
 #include <djv/UI/SubPanel.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ColorSwatch.h>
 #include <ftk/UI/ComboBox.h>
@@ -332,10 +333,10 @@ namespace djv
 
             p.settings = settings;
 
-            p.nfdCheckBox = ftk::CheckBox::create(context);
+            p.nfdCheckBox = djv::ui::CheckBox::create(context);
             p.nfdCheckBox->setHStretch(ftk::Stretch::Expanding);
 
-            p.floatingCheckBox = ftk::CheckBox::create(context);
+            p.floatingCheckBox = djv::ui::CheckBox::create(context);
             p.floatingCheckBox->setHStretch(ftk::Stretch::Expanding);
             p.floatingCheckBox->setTooltip(
                 "Show the file browser in a window of its own, so that it\n"
@@ -446,7 +447,7 @@ namespace djv
                 "  without them at the size of the first clip. Use this to\n"
                 "  play clips of differing resolutions at the same size.");
 
-            p.compatCheckBox = ftk::CheckBox::create(context);
+            p.compatCheckBox = djv::ui::CheckBox::create(context);
             p.compatCheckBox->setHStretch(ftk::Stretch::Expanding);
             p.compatCheckBox->setTooltip(
                 "Enable workarounds for timelines that may not conform exactly\n"
@@ -585,7 +586,7 @@ namespace djv
                 "only apply to an image sequence opened on its own, and\n"
                 "changing to or from one opens the file again.");
 
-            p.missingIndicatorCheckBox = ftk::CheckBox::create(context);
+            p.missingIndicatorCheckBox = djv::ui::CheckBox::create(context);
             p.missingIndicatorCheckBox->setTooltip(
                 "Mark a picture that stands in for a frame the sequence does\n"
                 "not have, so a render still in progress does not look\n"
@@ -616,7 +617,7 @@ namespace djv
             p.threadsEdit = ftk::IntEdit::create(context);
             p.threadsEdit->setRange(1, 64);
 
-            p.autoReloadCheckBox = ftk::CheckBox::create(context);
+            p.autoReloadCheckBox = djv::ui::CheckBox::create(context);
             p.autoReloadCheckBox->setTooltip(
                 "Reload the sequence being shown when new frames appear on "
                 "disk, as they do while a render is running. Checked every "
@@ -1048,7 +1049,7 @@ namespace djv
 
             p.settings = settings;
 
-            p.startPlaybackCheckBox = ftk::CheckBox::create(context);
+            p.startPlaybackCheckBox = djv::ui::CheckBox::create(context);
 
             p.layout = ftk::FormLayout::create(context);
 
@@ -1180,7 +1181,7 @@ namespace djv
 
             p.settings = settings;
 
-            p.yuvToRGBCheckBox = ftk::CheckBox::create(context);
+            p.yuvToRGBCheckBox = djv::ui::CheckBox::create(context);
             p.yuvToRGBCheckBox->setHStretch(ftk::Stretch::Expanding);
             p.yuvToRGBCheckBox->setTooltip(
                 "Convert YUV to RGB on the CPU when reading.\n"
@@ -1188,7 +1189,7 @@ namespace djv
                 "When disabled, YUV frames are kept and converted on the GPU.");
             ftk::setScreenshotTag(p.yuvToRGBCheckBox, "FFmpeg.YUVtoRGB");
 
-            p.hwAccelCheckBox = ftk::CheckBox::create(context);
+            p.hwAccelCheckBox = djv::ui::CheckBox::create(context);
             p.hwAccelCheckBox->setHStretch(ftk::Stretch::Expanding);
             // The minimal FFmpeg has no hardware decoders -- enabling one
             // would pull in the software decoder it depends on -- so the
@@ -1212,7 +1213,7 @@ namespace djv
             }
             ftk::setScreenshotTag(p.hwAccelCheckBox, "FFmpeg.HardwareDecoding");
 
-            p.audioMergeCheckBox = ftk::CheckBox::create(context);
+            p.audioMergeCheckBox = djv::ui::CheckBox::create(context);
             p.audioMergeCheckBox->setHStretch(ftk::Stretch::Expanding);
             p.audioMergeCheckBox->setTooltip(
                 "Play a file's mono audio streams as the channels of one track.\n"
@@ -1430,10 +1431,10 @@ namespace djv
             p.drawModeComboBox = ftk::ComboBox::create(context, tl::usd::getDrawModeLabels());
             p.drawModeComboBox->setHStretch(ftk::Stretch::Expanding);
 
-            p.lightingCheckBox = ftk::CheckBox::create(context);
+            p.lightingCheckBox = djv::ui::CheckBox::create(context);
             p.lightingCheckBox->setHStretch(ftk::Stretch::Expanding);
 
-            p.sRGBCheckBox = ftk::CheckBox::create(context);
+            p.sRGBCheckBox = djv::ui::CheckBox::create(context);
             p.sRGBCheckBox->setHStretch(ftk::Stretch::Expanding);
 
             p.stageCacheEdit = ftk::IntEdit::create(context);

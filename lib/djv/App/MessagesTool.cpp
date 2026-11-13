@@ -6,6 +6,7 @@
 #include <djv/App/App.h>
 
 #include <ftk/UI/ClipboardSystem.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/IWindow.h>
 #include <ftk/UI/RowLayout.h>
@@ -64,7 +65,7 @@ namespace djv
 
             p.clearButton = ftk::ToolButton::create(context, "Clear");
 
-            p.autoScrollCheckBox = ftk::CheckBox::create(context, "Auto-scroll");
+            p.autoScrollCheckBox = djv::ui::CheckBox::create(context, "Auto-scroll");
             bool autoScroll = true;
             p.settings->get(
                 ftk::Format("/{0}/AutoScroll").arg(getToolName()),

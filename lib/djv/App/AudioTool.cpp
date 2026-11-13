@@ -8,6 +8,7 @@
 #include <djv/Models/FilesModel.h>
 
 #include <djv/UI/SubPanel.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <djv/UI/ValueSlider.h>
@@ -68,7 +69,7 @@ namespace djv
             p.volumeSlider->setLargeStep(10);
             ftk::setScreenshotTag(p.volumeSlider, "Audio.Volume");
 
-            p.muteCheckBox = ftk::CheckBox::create(context);
+            p.muteCheckBox = djv::ui::CheckBox::create(context);
             ftk::setScreenshotTag(p.muteCheckBox, "Audio.Mute");
 
             p.channelComboBox = ftk::ComboBox::create(context);

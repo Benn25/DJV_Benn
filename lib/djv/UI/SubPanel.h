@@ -18,6 +18,10 @@ namespace djv
         //! a header lower and dimmer than a panel's. ftk::Bellows was drawn
         //! as wide and as strong as the panels themselves, and its sections
         //! read as panels. The same interface as ftk::Bellows.
+        //!
+        //! A press on the header opens or closes it, and dragging on across
+        //! the headers of the others of the same panel does the same to
+        //! them, as Blender's do.
         class DJV_UI_API_TYPE SubPanel : public ftk::IWidget
         {
             FTK_NON_COPYABLE(SubPanel);
@@ -74,6 +78,9 @@ namespace djv
             DJV_UI_API void setGeometry(const ftk::Box2I&) override;
             DJV_UI_API void sizeHintEvent(const ftk::SizeHintEvent&) override;
             DJV_UI_API void drawEvent(const ftk::Box2I&, const ftk::DrawEvent&) override;
+            DJV_UI_API void mouseMoveEvent(ftk::MouseMoveEvent&) override;
+            DJV_UI_API void mousePressEvent(ftk::MouseClickEvent&) override;
+            DJV_UI_API void mouseReleaseEvent(ftk::MouseClickEvent&) override;
 
         private:
             FTK_PRIVATE();

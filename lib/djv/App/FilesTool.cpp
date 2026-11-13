@@ -15,6 +15,7 @@
 
 #include <djv/UI/SubPanel.h>
 #include <ftk/UI/ButtonGroup.h>
+#include <djv/UI/CheckBox.h>
 #include <ftk/UI/CheckBox.h>
 #include <ftk/UI/ComboBox.h>
 #include <ftk/UI/Divider.h>
@@ -181,7 +182,7 @@ namespace djv
             p.compareTimeComboBox->setHStretch(ftk::Stretch::Expanding);
             ftk::setScreenshotTag(p.compareTimeComboBox, "Files.CompareTime");
 
-            p.sameSizeCheckBox = ftk::CheckBox::create(context);
+            p.sameSizeCheckBox = djv::ui::CheckBox::create(context);
             p.sameSizeCheckBox->setHStretch(ftk::Stretch::Expanding);
             p.sameSizeCheckBox->setTooltip(
                 "Draw the compared files at the size of the current file,\n"

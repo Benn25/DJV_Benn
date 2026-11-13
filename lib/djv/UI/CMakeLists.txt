@@ -1,6 +1,7 @@
 set(HEADERS
     AboutDialog.h
     AudioPopup.h
+    CheckBox.h
     ColorWidgets.h
     FileThumbnail.h
     FrameRangePopup.h
@@ -34,6 +35,7 @@ set(HEADERS_PRIVATE
 set(SOURCE
     AboutDialog.cpp
     AudioPopup.cpp
+    CheckBox.cpp
     ColorWidgets.cpp
     FileThumbnail.cpp
     FrameRangePopup.cpp

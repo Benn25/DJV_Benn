@@ -18,6 +18,10 @@
 #include <OpenColorIO/OpenColorIO.h>
 #endif // TLRENDER_OCIO
 
+#if defined(FTK_SDL3)
+#include <SDL3/SDL.h>
+#endif // FTK_SDL3
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -59,6 +63,36 @@ namespace djv
             const float drawHMax = 1200.F;
             // The grip under each scope, before the display scale.
             const float gripH = 8.F;
+
+            //! The narrowest the scopes go, as a part of the width of the
+            //! screen the window is on: a fixed width was a large part of a
+            //! 1080p screen, as a remote session has, and a small part of a
+            //! 4K one.
+            const float minWidthOfScreen = .12F;
+
+            //! The width of the screen the main window is on, in pixels; zero
+            //! when it cannot be found.
+            int getScreenWidth()
+            {
+                int out = 0;
+#if defined(FTK_SDL3)
+                int count = 0;
+                if (SDL_Window** windows = SDL_GetWindows(&count))
+                {
+                    if (count > 0)
+                    {
+                        if (const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(
+                            SDL_GetDisplayForWindow(windows[0])))
+                        {
+                            out = static_cast<int>(std::lround(
+                                mode->w * (mode->pixel_density > 0.F ? mode->pixel_density : 1.F)));
+                        }
+                    }
+                    SDL_free(windows);
+                }
+#endif // FTK_SDL3
+                return out;
+            }
 
             std::shared_ptr<ftk::Image> createImage(int w, int h)
             {
@@ -407,6 +441,7 @@ namespace djv
                 ftk::FontInfo fontInfo;
                 ftk::FontMetrics fontMetrics;
                 ftk::Size2I sizeHint;
+                int screenWidth = 0;
             };
             SizeData size;
 
@@ -532,7 +567,12 @@ namespace djv
                 p.size.fontInfo = event.style->getFont(ftk::FontType::Regular, event.displayScale);
                 p.size.fontMetrics = event.fontSystem->getMetrics(p.size.fontInfo);
             }
-            const int w = std::lround(280 * event.displayScale);
+            // A part of the screen, and never so narrow the labels collide.
+            const int w = p.size.screenWidth > 0 ?
+                std::max(
+                    static_cast<int>(std::lround(p.size.screenWidth * minWidthOfScreen)),
+                    static_cast<int>(std::lround(120 * event.displayScale))) :
+                static_cast<int>(std::lround(280 * event.displayScale));
             const int line = p.size.fontMetrics.lineHeight;
             p.size.sizeHint.w = w + p.size.margin * 2;
             const int grip = std::lround(gripH * event.displayScale);
@@ -553,6 +593,17 @@ namespace djv
         {
             IWidget::tickEvent(parentsVisible, parentsEnabled, event);
             FTK_P();
+            // The screen changes size when a remote session starts or ends,
+            // and the window can move to another screen.
+            if (parentsVisible && isVisible(false))
+            {
+                const int screenWidth = getScreenWidth();
+                if (screenWidth != p.size.screenWidth)
+                {
+                    p.size.screenWidth = screenWidth;
+                    setSizeUpdate();
+                }
+            }
             // Measured at most ten times a second, and only while shown: the
             // scopes cost nothing when the tool is closed.
             if (p.measuring.valid() &&

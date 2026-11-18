@@ -5,6 +5,8 @@
 #include <djv/App/ShellAssociations.h>
 #include <djv/UI/SysInfoDialog.h>
 #include <djv/UI/Viewport.h>
+
+#include <tlRender/UI/TimelineWidget.h>
 #include <djv/Models/Version.h>
 
 #include <djv/App/AudioTool.h>
@@ -628,12 +630,23 @@ namespace djv
             {
                 player->setCacheOptions(options);
             }
+            if (auto mainWindow = p.mainWindow)
+            {
+                mainWindow->getTimelineWidget()->setVideoCacheColor(value ?
+                    std::optional<ftk::Color4F>(getLowMemoryColor()) :
+                    std::nullopt);
+            }
             const float settingsGB = p.settingsModel->getCache().videoGB;
             report(value ?
                 ftk::Format("Low memory: a cache of {0} GB, a fifth of {1} GB").
                     arg(options.videoGB, 1).arg(settingsGB, 1).str() :
                 ftk::Format("Memory back to the settings: a cache of {0} GB").
                     arg(settingsGB, 1).str());
+        }
+
+        ftk::Color4F App::getLowMemoryColor()
+        {
+            return ftk::Color4F(1.F, .38F, .14F);
         }
 
         tl::PlayerCacheOptions App::getCacheOptions() const

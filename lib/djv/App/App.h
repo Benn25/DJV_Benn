@@ -331,6 +331,10 @@ namespace djv
             //! Set whether the memory is kept low.
             DJV_APP_API void setLowMemory(bool);
 
+            //! The color that says the memory is kept low: an orange red, in
+            //! the status bar and the timeline's cache.
+            DJV_APP_API static ftk::Color4F getLowMemoryColor();
+
             //! Get the cache options in use: the settings', or a fifth of
             //! them while the memory is kept low.
             DJV_APP_API tl::PlayerCacheOptions getCacheOptions() const;

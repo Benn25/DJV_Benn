@@ -22,12 +22,90 @@ namespace djv
 {
     namespace app
     {
+        namespace
+        {
+            //! A line of text in a color of its own, rather than one of the
+            //! style's: an ftk label only takes those.
+            class ColorLabel : public ftk::IWidget
+            {
+            protected:
+                void _init(const std::shared_ptr<ftk::Context>& context)
+                {
+                    IWidget::_init(context, "djv::app::ColorLabel", nullptr);
+                }
+
+            public:
+                static std::shared_ptr<ColorLabel> create(const std::shared_ptr<ftk::Context>& context)
+                {
+                    auto out = std::shared_ptr<ColorLabel>(new ColorLabel);
+                    out->_init(context);
+                    return out;
+                }
+
+                const std::string& getText() const { return _text; }
+
+                void setText(const std::string& value)
+                {
+                    if (value == _text)
+                        return;
+                    _text = value;
+                    setSizeUpdate();
+                    setDrawUpdate();
+                }
+
+                void setColor(const ftk::Color4F& value)
+                {
+                    _color = value;
+                    setDrawUpdate();
+                }
+
+                ftk::Size2I getSizeHint() const override { return _sizeHint; }
+
+                void sizeHintEvent(const ftk::SizeHintEvent& event) override
+                {
+                    IWidget::sizeHintEvent(event);
+                    const float s = event.displayScale;
+                    _marginX = event.style->getSizeRole(ftk::SizeRole::MarginSmall, s);
+                    _marginY = event.style->getSizeRole(ftk::SizeRole::MarginInside, s);
+                    _fontInfo = event.style->getFont(ftk::FontType::Regular, s);
+                    _fontMetrics = event.fontSystem->getMetrics(_fontInfo);
+                    const ftk::Size2I textSize = event.fontSystem->getSize(_text, _fontInfo);
+                    _sizeHint = ftk::Size2I(
+                        textSize.w + _marginX * 2,
+                        _fontMetrics.lineHeight + _marginY * 2);
+                }
+
+                void drawEvent(const ftk::Box2I& drawRect, const ftk::DrawEvent& event) override
+                {
+                    IWidget::drawEvent(drawRect, event);
+                    const ftk::Box2I& g = getGeometry();
+                    event.render->drawText(
+                        event.fontSystem->getGlyphs(_text, _fontInfo),
+                        _fontMetrics,
+                        ftk::V2I(
+                            g.min.x + _marginX,
+                            g.min.y + g.h() / 2 - _fontMetrics.lineHeight / 2),
+                        _color);
+                }
+
+            private:
+                std::string _text;
+                ftk::Color4F _color;
+                int _marginX = 0;
+                int _marginY = 0;
+                ftk::FontInfo _fontInfo;
+                ftk::FontMetrics _fontMetrics;
+                ftk::Size2I _sizeHint;
+            };
+        }
+
         struct StatusBar::Private
         {
             std::weak_ptr<App> app;
 
             std::shared_ptr<ftk::Label> messagesLabel;
             std::shared_ptr<ftk::Label> infoLabel;
+            std::shared_ptr<ColorLabel> lowMemoryLabel;
             std::shared_ptr<ftk::Label> memoryLabel;
             std::string message;
             std::string hint;
@@ -81,6 +159,10 @@ namespace djv
             // Memory in use, as Blender's status bar has it: what this
             // process holds, the system's use of its total, and the video
             // memory.
+            p.lowMemoryLabel = ColorLabel::create(context);
+            p.lowMemoryLabel->setColor(App::getLowMemoryColor());
+            p.lowMemoryLabel->setVisible(false);
+
             p.memoryLabel = ftk::Label::create(context);
             p.memoryLabel->setMarginRole(ftk::SizeRole::MarginSmall, ftk::SizeRole::MarginInside);
             p.memoryLabel->setTooltip(
@@ -94,6 +176,7 @@ namespace djv
             p.layout->setSpacingRole(ftk::SizeRole::SpacingTool);
             p.messagesLabel->setParent(p.layout);
             p.infoLabel->setParent(p.layout);
+            p.lowMemoryLabel->setParent(p.layout);
             p.memoryLabel->setParent(p.layout);
 
             p.messagesTimer = ftk::Timer::create(context);
@@ -238,18 +321,20 @@ namespace djv
         void StatusBar::_memoryUpdate()
         {
             FTK_P();
-            // Kept low, it says so first, with the cache size in use.
-            std::string text = getSystemMemoryLabel(getSystemMemory());
+            // Kept low, it says so first, in its color, with the cache size
+            // in use.
+            bool lowMemory = false;
             if (auto app = p.app.lock())
             {
-                if (app->isLowMemory())
+                lowMemory = app->isLowMemory();
+                if (lowMemory)
                 {
-                    text = ftk::Format("Low memory, cache {0} GB  {1}").
-                        arg(app->getCacheOptions().videoGB, 1).
-                        arg(text).str();
+                    p.lowMemoryLabel->setText(ftk::Format("Low memory, cache {0} GB").
+                        arg(app->getCacheOptions().videoGB, 1).str());
                 }
             }
-            p.memoryLabel->setText(text);
+            p.lowMemoryLabel->setVisible(lowMemory);
+            p.memoryLabel->setText(getSystemMemoryLabel(getSystemMemory()));
         }
 
         void StatusBar::_messagesUpdate()
@@ -452,6 +537,14 @@ namespace djv
                     g.min.y,
                     w,
                     g.h());
+            }
+            // The memory with what says it is kept low, as one.
+            if ("Memory" == tool && out.isValid() && p.lowMemoryLabel->isVisible(false))
+            {
+                const ftk::Box2I& g = p.lowMemoryLabel->getGeometry();
+                out = ftk::Box2I(
+                    ftk::V2I(std::min(g.min.x, out.min.x), std::min(g.min.y, out.min.y)),
+                    ftk::V2I(std::max(g.max.x, out.max.x), std::max(g.max.y, out.max.y)));
             }
             return out;
         }

@@ -155,6 +155,13 @@ namespace djv
             //! frame written again after the one before it was gives how
             //! long it took to render.
             std::map<std::string, std::set<int64_t> > frameTimesRefreshed;
+            //! The parts of each sequence rendered again, as first and last
+            //! frame, the one written to last at the end: a render going on
+            //! from where one stopped carries it on, one starting elsewhere
+            //! is a part of its own, and one overtaken by a later one is
+            //! dropped.
+            std::map<std::string, std::vector<std::pair<int64_t, int64_t> > > refreshRuns;
+            std::vector<OTIO_NS::RationalTime> refreshMarks;
             //! The files other runs hand over, opened here as tabs; see
             //! SingleInstance.h.
             std::unique_ptr<InstanceReceiver> instanceReceiver;
@@ -170,6 +177,7 @@ namespace djv
             bool filesChanged = false;
             std::shared_ptr<ftk::Observable<std::shared_ptr<tl::Player> > > player;
             std::shared_ptr<ftk::Observable<std::string> > report;
+            std::shared_ptr<ftk::Observable<bool> > lowMemory;
             std::shared_ptr<ftk::Observable<std::optional<models::LayerStack> > > layerStack;
             std::shared_ptr<models::ColorModel> colorModel;
             std::shared_ptr<ui::ColorResetDialog> colorResetDialog;

@@ -600,6 +600,54 @@ namespace djv
             return _p->report;
         }
 
+        const std::vector<OTIO_NS::RationalTime>& App::getRefreshMarks() const
+        {
+            return _p->refreshMarks;
+        }
+
+        bool App::isLowMemory() const
+        {
+            return _p->lowMemory->get();
+        }
+
+        std::shared_ptr<ftk::IObservable<bool> > App::observeLowMemory() const
+        {
+            return _p->lowMemory;
+        }
+
+        void App::setLowMemory(bool value)
+        {
+            FTK_P();
+            if (!p.lowMemory->setIfChanged(value))
+                return;
+            // Smaller, the cache lets go of the frames that no longer fit,
+            // and the image buffers kept for reuse with them; larger, it
+            // fills again.
+            const tl::PlayerCacheOptions options = getCacheOptions();
+            if (auto player = p.player->get())
+            {
+                player->setCacheOptions(options);
+            }
+            const float settingsGB = p.settingsModel->getCache().videoGB;
+            report(value ?
+                ftk::Format("Low memory: a cache of {0} GB, a fifth of {1} GB").
+                    arg(options.videoGB, 1).arg(settingsGB, 1).str() :
+                ftk::Format("Memory back to the settings: a cache of {0} GB").
+                    arg(settingsGB, 1).str());
+        }
+
+        tl::PlayerCacheOptions App::getCacheOptions() const
+        {
+            FTK_P();
+            tl::PlayerCacheOptions out = p.settingsModel->getCache();
+            if (p.lowMemory->get())
+            {
+                out.videoGB *= .2F;
+                out.audioGB *= .2F;
+            }
+            return out;
+        }
+
         const std::shared_ptr<ToolWidgetFactory>& App::getToolWidgetFactory() const
         {
             return _p->toolWidgetFactory;

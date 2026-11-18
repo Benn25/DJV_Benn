@@ -476,6 +476,7 @@ namespace djv
 
             p.player = ftk::Observable<std::shared_ptr<tl::Player> >::create();
             p.report = ftk::Observable<std::string>::create();
+            p.lowMemory = ftk::Observable<bool>::create(false);
             p.layerStack = ftk::Observable<std::optional<models::LayerStack> >::create();
 
             // The audio device's buffer size is the audio system's to give
@@ -490,11 +491,11 @@ namespace djv
 
             p.cacheObserver = ftk::Observer<tl::PlayerCacheOptions>::create(
                 p.settingsModel->observeCache(),
-                [this](const tl::PlayerCacheOptions& value)
+                [this](const tl::PlayerCacheOptions&)
                 {
                     if (auto player = _p->player->get())
                     {
-                        player->setCacheOptions(value);
+                        player->setCacheOptions(getCacheOptions());
                     }
                 });
 

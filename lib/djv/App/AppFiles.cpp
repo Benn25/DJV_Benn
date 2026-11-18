@@ -691,9 +691,19 @@ namespace djv
                 std::string refreshedLastKey;
                 int64_t refreshedLastFrame = 0;
                 int pad = 0;
+                std::map<std::string, std::vector<int64_t> > refreshedBySeq;
                 if (!same)
                 {
                     p.frameTimesRefreshed.clear();
+                    p.refreshRuns.clear();
+                    if (!p.refreshMarks.empty())
+                    {
+                        p.refreshMarks.clear();
+                        if (auto mainWindow = p.mainWindow)
+                        {
+                            mainWindow->getTimelineWidget()->setTimeMarks({}, refreshedFramesColor);
+                        }
+                    }
                 }
                 std::map<std::string, std::set<int64_t> > arrived;
                 for (const auto& seqTimes : times)
@@ -720,6 +730,7 @@ namespace djv
                             if (!arrivedBefore.count(i.first))
                             {
                                 refreshed.push_back(i.first);
+                                refreshedBySeq[seqTimes.first].push_back(i.first);
                                 p.frameTimesRefreshed[seqTimes.first].insert(i.first);
                                 pad = std::max(pad, seq->second.path.getPad());
                                 if (t && (!refreshedLast || t.value() > refreshedLast.value()))
@@ -747,12 +758,59 @@ namespace djv
                 {
                     std::sort(refreshed.begin(), refreshed.end());
                     refreshed.erase(std::unique(refreshed.begin(), refreshed.end()), refreshed.end());
+                    // The parts rendered again, frame by frame in the order
+                    // they were written.
+                    for (auto& i : refreshedBySeq)
+                    {
+                        std::sort(i.second.begin(), i.second.end());
+                        auto& runs = p.refreshRuns[i.first];
+                        for (const int64_t frame : i.second)
+                        {
+                            const auto carried = std::find_if(
+                                runs.rbegin(),
+                                runs.rend(),
+                                [frame](const std::pair<int64_t, int64_t>& run)
+                                {
+                                    return run.second == frame - 1;
+                                });
+                            std::pair<int64_t, int64_t> run(frame, frame);
+                            if (carried != runs.rend())
+                            {
+                                run = *carried;
+                                run.second = frame;
+                                runs.erase(std::next(carried).base());
+                            }
+                            // Those this one has overtaken: the older pass
+                            // ended inside it.
+                            runs.erase(
+                                std::remove_if(
+                                    runs.begin(),
+                                    runs.end(),
+                                    [&run](const std::pair<int64_t, int64_t>& other)
+                                    {
+                                        return other.second >= run.first && other.second <= run.second;
+                                    }),
+                                runs.end());
+                            runs.push_back(run);
+                        }
+                    }
                     std::string text = framesReport("Refreshed", refreshed, pad);
                     // How long the last of them took to render: since the
                     // frame before it was written again, as a render writes
                     // them one after the other.
-                    if (refreshedLast &&
-                        p.frameTimesRefreshed[refreshedLastKey].count(refreshedLastFrame - 1))
+                    // Only from a frame of the same part: one from an
+                    // older pass, or from before a part was started, says
+                    // nothing of how long this one took.
+                    const auto& lastRuns = p.refreshRuns[refreshedLastKey];
+                    const bool sameRun = std::any_of(
+                        lastRuns.begin(),
+                        lastRuns.end(),
+                        [refreshedLastFrame](const std::pair<int64_t, int64_t>& run)
+                        {
+                            return run.second == refreshedLastFrame &&
+                                run.first <= refreshedLastFrame - 1;
+                        });
+                    if (refreshedLast && sameRun)
                     {
                         const auto& seqTimes = times.at(refreshedLastKey);
                         const auto last = seqTimes.find(refreshedLastFrame);
@@ -767,17 +825,38 @@ namespace djv
                         }
                     }
                     report(text);
+
+                    // How far each has got: the end of its last frame written.
+                    std::vector<OTIO_NS::RationalTime> marks;
+                    for (const auto& i : p.refreshRuns)
+                    {
+                        const auto seq = seqs.find(i.first);
+                        if (seq == seqs.end())
+                            continue;
+                        for (const auto& run : i.second)
+                        {
+                            if (const auto t = seq->second.toTime(run.second))
+                            {
+                                marks.push_back(t.value() + OTIO_NS::RationalTime(1.0, rate));
+                            }
+                        }
+                    }
+                    std::sort(marks.begin(), marks.end());
+                    marks.erase(std::unique(marks.begin(), marks.end()), marks.end());
+                    p.refreshMarks = marks;
+                    std::vector<std::string> ends;
+                    for (const auto& mark : marks)
+                    {
+                        ends.push_back(ftk::Format("{0}").arg(static_cast<int64_t>(mark.value()) - 1));
+                    }
+                    _context->log(
+                        "djv::app::App",
+                        ftk::Format("Parts rendered again end at frame(s): {0}").arg(ftk::join(ends, ", ")));
+
                     if (auto mainWindow = p.mainWindow)
                     {
                         mainWindow->getViewport()->showReport(text, refreshedFramesColor);
-                        // How far it has been rendered again: the end of the
-                        // last frame written.
-                        if (refreshedLast)
-                        {
-                            mainWindow->getTimelineWidget()->setTimeMark(
-                                refreshedLast.value() + OTIO_NS::RationalTime(1.0, rate),
-                                refreshedFramesColor);
-                        }
+                        mainWindow->getTimelineWidget()->setTimeMarks(marks, refreshedFramesColor);
                     }
                 }
                 p.frameTimesArrived = arrived;
@@ -1479,7 +1558,7 @@ namespace djv
                             {
                                 tl::PlayerOptions playerOptions;
                                 playerOptions.audioDevice = p.audioModel->getDevice();
-                                playerOptions.cache = p.settingsModel->getCache();
+                                playerOptions.cache = getCacheOptions();
                                 playerOptions.audioBufferFrameCount =
                                     p.settingsModel->getAudio().bufferFrameCount;
                                 player = tl::Player::create(_context, timeline, playerOptions);

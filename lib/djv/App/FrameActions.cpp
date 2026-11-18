@@ -35,6 +35,65 @@ namespace djv
             }
         }
 
+        namespace
+        {
+            //! The places Up and Down go between, as Blender's go between
+            //! keyframes: the start, the last frame written of each part of
+            //! the sequence rendered again, and the end.
+            std::vector<OTIO_NS::RationalTime> getRefreshStops(
+                const std::shared_ptr<App>& app,
+                const std::shared_ptr<tl::Player>& player)
+            {
+                const OTIO_NS::TimeRange& range = player->getInOutRange();
+                const double rate = range.duration().rate();
+                std::vector<OTIO_NS::RationalTime> out;
+                out.push_back(range.start_time());
+                for (const auto& mark : app->getRefreshMarks())
+                {
+                    const OTIO_NS::RationalTime t =
+                        mark.rescaled_to(rate) - OTIO_NS::RationalTime(1.0, rate);
+                    if (t > range.start_time() && t < range.end_time_inclusive())
+                    {
+                        out.push_back(t);
+                    }
+                }
+                out.push_back(range.end_time_inclusive());
+                return out;
+            }
+
+            void seekRefresh(const std::shared_ptr<App>& app, int direction)
+            {
+                auto player = app->observePlayer()->get();
+                if (!player)
+                    return;
+                const auto stops = getRefreshStops(app, player);
+                const double rate = player->getInOutRange().duration().rate();
+                const OTIO_NS::RationalTime current = player->getCurrentTime().rescaled_to(rate).round();
+                if (direction > 0)
+                {
+                    for (const auto& stop : stops)
+                    {
+                        if (stop.round() > current)
+                        {
+                            player->seek(stop);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    for (auto i = stops.rbegin(); i != stops.rend(); ++i)
+                    {
+                        if (i->round() < current)
+                        {
+                            player->seek(*i);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         struct FrameActions::Private
         {
 
@@ -175,6 +234,27 @@ namespace djv
                     }
                 });
 
+            _addCommand(
+                "NextRefresh",
+                "Go to where the next part of the sequence rendered again has got, or to the end.",
+                [appWeak](const nlohmann::json&)
+                {
+                    if (auto app = appWeak.lock())
+                    {
+                        seekRefresh(app, 1);
+                    }
+                });
+            _addCommand(
+                "PrevRefresh",
+                "Go to where the previous part of the sequence rendered again has got, or to the start.",
+                [appWeak](const nlohmann::json&)
+                {
+                    if (auto app = appWeak.lock())
+                    {
+                        seekRefresh(app, -1);
+                    }
+                });
+
             // Create the actions.
             _actions["Start"] = ftk::Action::create(
                 "Go To Start",
@@ -204,6 +284,12 @@ namespace djv
             _actions["NextX100"] = ftk::Action::create(
                 "Forward a Second",
                 _command("NextX100"));
+            _actions["NextRefresh"] = ftk::Action::create(
+                "Next Refresh",
+                _command("NextRefresh"));
+            _actions["PrevRefresh"] = ftk::Action::create(
+                "Previous Refresh",
+                _command("PrevRefresh"));
             _actions["FocusCurrent"] = ftk::Action::create(
                 "Focus Current Frame",
                 _command("FocusCurrent"));
@@ -220,6 +306,10 @@ namespace djv
             _addShortcut("Next", "Next", ftk::Key::Right);
             _addShortcut("NextX10", "Next X10", ftk::KeyShortcut(ftk::Key::Right, static_cast<int>(ftk::KeyModifier::Alt)));
             _addShortcut("NextX100", "Forward a second", ftk::KeyShortcut(ftk::Key::Right, static_cast<int>(ftk::KeyModifier::Control)));
+            // From one part rendered again to the next by Up and Down, as
+            // Blender goes from keyframe to keyframe.
+            _addShortcut("NextRefresh", "Next Refresh", ftk::Key::Up);
+            _addShortcut("PrevRefresh", "Previous Refresh", ftk::Key::Down);
             _addShortcut("FocusCurrent", "Focus Current", ftk::KeyShortcut(ftk::Key::F, static_cast<int>(ftk::KeyModifier::Control)));
 
             _shortcutsUpdate(app->getSettingsModel()->getShortcuts());
@@ -243,6 +333,8 @@ namespace djv
                     _actions["Next"]->setEnabled(frames);
                     _actions["NextX10"]->setEnabled(frames);
                     _actions["NextX100"]->setEnabled(frames);
+                    _actions["NextRefresh"]->setEnabled(frames);
+                    _actions["PrevRefresh"]->setEnabled(frames);
                     _actions["FocusCurrent"]->setEnabled(player);
                 });
         }

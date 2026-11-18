@@ -28,6 +28,9 @@ namespace djv
             addAction(actions["NextX10"]);
             addAction(actions["NextX100"]);
             addDivider();
+            addAction(actions["NextRefresh"]);
+            addAction(actions["PrevRefresh"]);
+            addDivider();
             addAction(actions["FocusCurrent"]);
         }
 

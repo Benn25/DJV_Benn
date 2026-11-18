@@ -316,6 +316,25 @@ namespace djv
             //! Observe the reports.
             DJV_APP_API std::shared_ptr<ftk::IObservable<std::string> > observeReport() const;
 
+            //! Get where each part of the sequence shown that was rendered
+            //! again has got to: the end of the last frame written of each,
+            //! on the timeline, earliest first.
+            DJV_APP_API const std::vector<OTIO_NS::RationalTime>& getRefreshMarks() const;
+
+            //! Get whether the memory is kept low: the caches at a fifth of
+            //! their size in the settings, until set back. Not saved.
+            DJV_APP_API bool isLowMemory() const;
+
+            //! Observe whether the memory is kept low.
+            DJV_APP_API std::shared_ptr<ftk::IObservable<bool> > observeLowMemory() const;
+
+            //! Set whether the memory is kept low.
+            DJV_APP_API void setLowMemory(bool);
+
+            //! Get the cache options in use: the settings', or a fifth of
+            //! them while the memory is kept low.
+            DJV_APP_API tl::PlayerCacheOptions getCacheOptions() const;
+
             //! Get the tool widget factory.
             DJV_APP_API const std::shared_ptr<ToolWidgetFactory>& getToolWidgetFactory() const;
 

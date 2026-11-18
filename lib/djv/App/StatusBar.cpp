@@ -43,6 +43,7 @@ namespace djv
             std::shared_ptr<ftk::ListObserver<ftk::LogItem> > messagesObserver;
             std::shared_ptr<ftk::Observer<std::shared_ptr<tl::Player> > > playerObserver;
             std::shared_ptr<ftk::Observer<std::string> > reportObserver;
+            std::shared_ptr<ftk::Observer<bool> > lowMemoryObserver;
             std::shared_ptr<ftk::Observer<std::string> > mediaReferenceKeyObserver;
             std::shared_ptr<ftk::Observer<int> > videoLayerObserver;
         };
@@ -84,7 +85,10 @@ namespace djv
             p.memoryLabel->setMarginRole(ftk::SizeRole::MarginSmall, ftk::SizeRole::MarginInside);
             p.memoryLabel->setTooltip(
                 "RAM: the memory DJV uses (the system's use of its total).\n"
-                "VRAM: the video memory DJV uses, of the graphics card's total.");
+                "VRAM: the video memory DJV uses, of the graphics card's total.\n"
+                "\n"
+                "Click to keep the memory low: the cache at a fifth of its size\n"
+                "in the settings, until clicked again.");
 
             p.layout = ftk::HorizontalLayout::create(context, shared_from_this());
             p.layout->setSpacingRole(ftk::SizeRole::SpacingTool);
@@ -129,6 +133,13 @@ namespace djv
                                 _messagesUpdate();
                             });
                     }
+                });
+
+            p.lowMemoryObserver = ftk::Observer<bool>::create(
+                app->observeLowMemory(),
+                [this](bool)
+                {
+                    _memoryUpdate();
                 });
 
             // A report shows where the messages do, for as long.
@@ -227,7 +238,18 @@ namespace djv
         void StatusBar::_memoryUpdate()
         {
             FTK_P();
-            p.memoryLabel->setText(getSystemMemoryLabel(getSystemMemory()));
+            // Kept low, it says so first, with the cache size in use.
+            std::string text = getSystemMemoryLabel(getSystemMemory());
+            if (auto app = p.app.lock())
+            {
+                if (app->isLowMemory())
+                {
+                    text = ftk::Format("Low memory, cache {0} GB  {1}").
+                        arg(app->getCacheOptions().videoGB, 1).
+                        arg(text).str();
+                }
+            }
+            p.memoryLabel->setText(text);
         }
 
         void StatusBar::_messagesUpdate()
@@ -317,7 +339,14 @@ namespace djv
             setDrawUpdate();
             // A cancelled press (a touch gesture took it) opens nothing.
             const std::string tool = event.cancel ? std::string() : _getTool(event.pos);
-            if (!tool.empty())
+            if ("Memory" == tool)
+            {
+                if (auto app = p.app.lock())
+                {
+                    app->setLowMemory(!app->isLowMemory());
+                }
+            }
+            else if (!tool.empty())
             {
                 if (auto app = p.app.lock())
                 {
@@ -391,7 +420,7 @@ namespace djv
         std::string StatusBar::_getTool(const ftk::V2I& pos) const
         {
             std::string out;
-            for (const std::string& tool : { "Messages", "Information" })
+            for (const std::string& tool : { "Messages", "Information", "Memory" })
             {
                 const ftk::Box2I box = _getToolBox(tool);
                 if (box.isValid() && ftk::contains(box, pos))
@@ -409,7 +438,10 @@ namespace djv
             // and an empty stretch of it is not something to click.
             FTK_P();
             ftk::Box2I out;
-            const auto& label = "Messages" == tool ? p.messagesLabel : p.infoLabel;
+            const auto& label =
+                "Messages" == tool ? p.messagesLabel :
+                "Memory" == tool ? p.memoryLabel :
+                p.infoLabel;
             if (!label->getText().empty())
             {
                 const ftk::Box2I& g = label->getGeometry();

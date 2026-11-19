@@ -493,15 +493,22 @@ namespace djv
             }
             auto a = p.filesModel->getA();
             auto player = p.player->get();
+            if (!a || !player)
+            {
+                return;
+            }
+            // Frames written over, while playing too: it only reads those
+            // again, and a frame read as a render wrote it is caught then
+            // rather than when playback stops.
+            _frameTimesCheck(player);
             // A sequence whose frames were found rather than stated, and
             // only while stopped: a reload in the middle of playback would
             // interrupt it, and one stopped catches up at the next check.
-            if (!a || a->framesStated || !player ||
+            if (a->framesStated ||
                 tl::Playback::Stop != player->getPlayback())
             {
                 return;
             }
-            _frameTimesCheck(player);
             const ftk::Path& path = player->getPath();
             if (!path.isSeq())
             {

@@ -625,22 +625,27 @@ namespace djv
             // Smaller, the cache lets go of the frames that no longer fit,
             // and the image buffers kept for reuse with them; larger, it
             // fills again.
+            // Emptied as well, either way: read again from the files, the
+            // cache has whatever was written over since, which a frame read
+            // as a render wrote it can miss.
             const tl::PlayerCacheOptions options = getCacheOptions();
             if (auto player = p.player->get())
             {
                 player->setCacheOptions(options);
+                player->clearCache();
             }
             if (auto mainWindow = p.mainWindow)
             {
                 mainWindow->getTimelineWidget()->setVideoCacheColor(value ?
                     std::optional<ftk::Color4F>(getLowMemoryColor()) :
                     std::nullopt);
+                mainWindow->getTimelineWidget()->refreshMedia();
             }
             const float settingsGB = p.settingsModel->getCache().videoGB;
             report(value ?
-                ftk::Format("Low memory: a cache of {0} GB, a fifth of {1} GB").
+                ftk::Format("Low memory: the cache emptied, to {0} GB, a fifth of {1} GB").
                     arg(options.videoGB, 1).arg(settingsGB, 1).str() :
-                ftk::Format("Memory back to the settings: a cache of {0} GB").
+                ftk::Format("Memory back to the settings: the cache emptied, to {0} GB").
                     arg(settingsGB, 1).str());
         }
 

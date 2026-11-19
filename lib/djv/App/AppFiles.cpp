@@ -453,6 +453,10 @@ namespace djv
             const ftk::Color4F newFramesColor(.30F, .76F, .36F);
             const ftk::Color4F refreshedFramesColor(.68F, .84F, .22F);
 
+            //! The timeline's line for a frame rendered again alone, not as
+            //! one of a series: a little more orange.
+            const ftk::Color4F refreshedFrameColor(.95F, .62F, .18F);
+
             //! Seconds to three significant digits: "0.254s", "4.23s",
             //! "23.6s", "512s".
             std::string secondsLabel(double value)
@@ -708,7 +712,7 @@ namespace djv
                         p.refreshMarks.clear();
                         if (auto mainWindow = p.mainWindow)
                         {
-                            mainWindow->getTimelineWidget()->setTimeMarks({}, refreshedFramesColor);
+                            mainWindow->getTimelineWidget()->setTimeMarks({});
                         }
                     }
                 }
@@ -834,7 +838,10 @@ namespace djv
                     report(text);
 
                     // How far each has got: the end of its last frame written.
-                    std::vector<OTIO_NS::RationalTime> marks;
+                    // In green for a part of more than one frame, a render
+                    // of several in a row; in orange for one frame alone,
+                    // which a part is until its second frame comes.
+                    std::vector<tl::ui::TimeMark> timeMarks;
                     for (const auto& i : p.refreshRuns)
                     {
                         const auto seq = seqs.find(i.first);
@@ -844,12 +851,35 @@ namespace djv
                         {
                             if (const auto t = seq->second.toTime(run.second))
                             {
-                                marks.push_back(t.value() + OTIO_NS::RationalTime(1.0, rate));
+                                timeMarks.push_back(tl::ui::TimeMark{
+                                    t.value() + OTIO_NS::RationalTime(1.0, rate),
+                                    run.second > run.first ? refreshedFramesColor : refreshedFrameColor });
                             }
                         }
                     }
-                    std::sort(marks.begin(), marks.end());
-                    marks.erase(std::unique(marks.begin(), marks.end()), marks.end());
+                    // Where two end together, a series wins.
+                    std::sort(
+                        timeMarks.begin(),
+                        timeMarks.end(),
+                        [](const tl::ui::TimeMark& a, const tl::ui::TimeMark& b)
+                        {
+                            return a.time < b.time ||
+                                (a.time == b.time && a.color == refreshedFramesColor && b.color != refreshedFramesColor);
+                        });
+                    timeMarks.erase(
+                        std::unique(
+                            timeMarks.begin(),
+                            timeMarks.end(),
+                            [](const tl::ui::TimeMark& a, const tl::ui::TimeMark& b)
+                            {
+                                return a.time == b.time;
+                            }),
+                        timeMarks.end());
+                    std::vector<OTIO_NS::RationalTime> marks;
+                    for (const auto& timeMark : timeMarks)
+                    {
+                        marks.push_back(timeMark.time);
+                    }
                     p.refreshMarks = marks;
                     std::vector<std::string> ends;
                     for (const auto& mark : marks)
@@ -863,7 +893,7 @@ namespace djv
                     if (auto mainWindow = p.mainWindow)
                     {
                         mainWindow->getViewport()->showReport(text, refreshedFramesColor);
-                        mainWindow->getTimelineWidget()->setTimeMarks(marks, refreshedFramesColor);
+                        mainWindow->getTimelineWidget()->setTimeMarks(timeMarks);
                     }
                 }
                 p.frameTimesArrived = arrived;

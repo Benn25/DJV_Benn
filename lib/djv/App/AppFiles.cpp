@@ -882,9 +882,11 @@ namespace djv
                     }
                     p.refreshMarks = marks;
                     std::vector<std::string> ends;
-                    for (const auto& mark : marks)
+                    for (const auto& timeMark : timeMarks)
                     {
-                        ends.push_back(ftk::Format("{0}").arg(static_cast<int64_t>(mark.value()) - 1));
+                        ends.push_back(ftk::Format("{0}{1}").
+                            arg(static_cast<int64_t>(timeMark.time.value()) - 1).
+                            arg(timeMark.color == refreshedFramesColor ? "" : " (alone)"));
                     }
                     _context->log(
                         "djv::app::App",

@@ -899,6 +899,35 @@ namespace djv
                     }
                 }
                 p.frameTimesArrived = arrived;
+
+                // The holes: frames missing between the first and the last
+                // there are, on the timeline, for it to show them.
+                std::vector<OTIO_NS::TimeRange> holes;
+                for (const auto& seqTimes : times)
+                {
+                    const auto seq = seqs.find(seqTimes.first);
+                    if (seq == seqs.end() || seqTimes.second.size() < 2)
+                        continue;
+                    int64_t prev = seqTimes.second.begin()->first;
+                    for (auto i = std::next(seqTimes.second.begin()); i != seqTimes.second.end(); ++i)
+                    {
+                        if (i->first > prev + 1)
+                        {
+                            const auto t0 = seq->second.toTime(prev + 1);
+                            const auto t1 = seq->second.toTime(i->first - 1);
+                            if (t0 && t1)
+                            {
+                                holes.push_back(OTIO_NS::TimeRange::range_from_start_end_time_inclusive(
+                                    t0.value(), t1.value()));
+                            }
+                        }
+                        prev = i->first;
+                    }
+                }
+                if (auto mainWindow = p.mainWindow)
+                {
+                    mainWindow->getTimelineWidget()->setHoles(holes);
+                }
                 p.frameTimes = times;
                 p.frameTimesPath = key;
             }

@@ -879,6 +879,7 @@ namespace djv
                             }
                         }
                         _hudUpdate();
+                        setDrawUpdate();
                     });
 
                 p.cacheObserver = ftk::Observer<tl::PlayerCacheInfo>::create(
@@ -1903,6 +1904,44 @@ namespace djv
         {
             tl::ui::Viewport::drawOverlayEvent(drawRect, event);
             FTK_P();
+            // A hole in the sequence: the frame shown is one held over it,
+            // which looks just like a render that stopped. Said as long as
+            // it lasts, top middle, in a color nothing else here uses, and
+            // under the report when there is one.
+            int reportBottom = 0;
+            if (!p.reportText.empty())
+            {
+                const float s = event.displayScale;
+                const ftk::FontMetrics fontMetrics = event.fontSystem->getMetrics(
+                    event.style->getFont(ftk::FontType::Regular, s));
+                const int marginY = event.style->getSizeRole(ftk::SizeRole::MarginSmall, s);
+                reportBottom = fontMetrics.lineHeight + marginY * 3;
+            }
+            if (p.missing && !p.videoFrames.empty())
+            {
+                const std::string text = p.heldFrom.has_value() ?
+                    ftk::Format("No frame here: frame {0} is held").arg(p.heldFrom.value()).str() :
+                    std::string("No frame here");
+                const float s = event.displayScale;
+                const ftk::FontInfo fontInfo = event.style->getFont(ftk::FontType::Regular, s);
+                const ftk::FontMetrics fontMetrics = event.fontSystem->getMetrics(fontInfo);
+                const ftk::Size2I textSize = event.fontSystem->getSize(text, fontInfo);
+                const int marginX = event.style->getSizeRole(ftk::SizeRole::Margin, s);
+                const int marginY = event.style->getSizeRole(ftk::SizeRole::MarginSmall, s);
+                const ftk::Box2I& g = getGeometry();
+                const ftk::Box2I box(
+                    g.min.x + g.w() / 2 - textSize.w / 2 - marginX,
+                    g.min.y + marginY + reportBottom,
+                    textSize.w + marginX * 2,
+                    fontMetrics.lineHeight + marginY * 2);
+                event.render->drawRect(box, ftk::Color4F(.92F, .28F, .72F));
+                event.render->drawText(
+                    event.fontSystem->getGlyphs(text, fontInfo),
+                    fontMetrics,
+                    ftk::V2I(box.min.x + marginX, box.min.y + marginY),
+                    ftk::Color4F(.08F, .08F, .08F));
+            }
+
             // The report, top middle, dark text on its color, fading out.
             if (!p.reportText.empty())
             {
